@@ -4,6 +4,8 @@ Manacá LLM — Script 01: Aquisição do GigaVerbo
 ===============================================
 LNCC × NII/LLM-jp | Fase 1 — Corpus PT-BR
 
+================================ PT (Português) ================================
+
 Baixa TucanoBR/GigaVerbo em Apache Parquet + Zstandard,
 particionado em shards de 50.000 documentos.
 Idempotente: retoma automaticamente do último shard salvo.
@@ -39,8 +41,47 @@ Saída:
     ├── download.log           log estruturado com timestamps
     └── _manifest.json         metadados por shard (SHA-256, contagens)
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
-Versão: 0.1.0 — Abril 2026
+================================= EN (English) =================================
+
+Manacá LLM — Script 01: GigaVerbo Acquisition
+
+Downloads TucanoBR/GigaVerbo in Apache Parquet + Zstandard,
+partitioned into shards of 50,000 documents.
+Idempotent: automatically resumes from the last saved shard.
+
+Scientific rationale:
+    De Lucena et al. (2024, arXiv:2411.07854) show that GigaVerbo
+    as a pre-training base outperforms larger multilingual corpora (mC4,
+    CC-100) on PT-BR benchmarks — quality and specificity outweigh raw
+    volume. 200B tokens · Apache 2.0 · no authentication.
+
+MANDATORY PREREQUISITE:
+    1. Writable WORK_DIR working volume (Docker bind mount ./data, or NFS/HPC)
+    2. python corpus/scripts/00_verify_env.py returning OK
+
+Usage:
+    # Check the environment (mandatory):
+    python corpus/scripts/00_verify_env.py
+
+    # Production — always via screen:
+    # Docker (recommended): detached container, logs persisted on the volume
+    docker compose run -d --name gigaverbo corpus python corpus/scripts/01_acquire_gigaverbo.py
+    docker compose logs -f gigaverbo
+    tail -f $WORK_DIR/raw/gigaverbo/download.log
+
+    # Quick test (foreground, interruptible with Ctrl+C):
+    python corpus/scripts/01_acquire_gigaverbo.py
+
+Output:
+    $WORK_DIR/raw/gigaverbo/
+    ├── shard_000000.parquet   (~100-200 MB · Zstd)
+    ├── shard_000001.parquet
+    ├── ...
+    ├── download.log           structured log with timestamps
+    └── _manifest.json         per-shard metadata (SHA-256, counts)
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+Versão | Version: 0.1.0 — Abril 2026
 """
 
 from __future__ import annotations
@@ -501,8 +542,19 @@ def acquire() -> dict[str, Any]:
     logger.info(f"  Tempo total:    {elapsed / 3600:.1f} horas")
     logger.info(f"  Output:         {OUTPUT_DIR}")
     logger.info(f"  Manifesto:      {MANIFEST_PATH}")
+    logger.info("-" * 60)
+    logger.info(f"DONE — {SOURCE_NAME}")
+    logger.info(f"  Docs kept:      {kept:,}")
+    logger.info(f"  Docs skipped:   {skipped:,}")
+    logger.info(f"  Retention rate: {final['retention_rate']:.1%}")
+    logger.info(f"  Shards:         {shard_id + 1}")
+    logger.info(f"  Total size:     {total_bytes / 1e9:.2f} GB")
+    logger.info(f"  Est. tokens:    {est_tokens / 1e9:.1f}B")
+    logger.info(f"  Total time:     {elapsed / 3600:.1f} hours")
+    logger.info(f"  Output:         {OUTPUT_DIR}")
+    logger.info(f"  Manifest:       {MANIFEST_PATH}")
     logger.info("=" * 60)
-    logger.info("Proximo passo: python corpus/scripts/02_acquire_madlad400.py")
+    logger.info("Proximo passo | Next step: python corpus/scripts/02_acquire_madlad400.py")
 
     return final
 

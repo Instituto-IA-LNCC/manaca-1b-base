@@ -2,6 +2,7 @@
 # =============================================================================
 # Manaca-1B - Constroi a imagem manaca-lmeval SEM `docker build`
 # -----------------------------------------------------------------------------
+# PT --------------------------------------------------------------------------
 # Em alguns hosts o `docker build` nao aceita --sysctl e o DNS quebra com IPv6 (o
 # pip nao resolve o pypi). Aqui instalamos o lm-eval DENTRO da manaca-train (que ja
 # tem torch + transformers==4.46.3, compatíveis) via `docker run` com IPv6
@@ -9,6 +10,18 @@
 # entrypoint da base. Nada de novo build.
 #
 # Uso:
+#   ./scripts/eval/build_lmeval_image.sh
+# Overrides: BASE_IMAGE (default manaca-train:latest), OUT_IMAGE (manaca-lmeval:latest).
+#
+# EN --------------------------------------------------------------------------
+# Manaca-1B - Build the manaca-lmeval image WITHOUT `docker build`
+# On some hosts `docker build` does not accept --sysctl and DNS breaks with IPv6
+# (pip cannot resolve pypi). Here we install lm-eval INSIDE manaca-train (which
+# already has torch + transformers==4.46.3, compatible) via `docker run` with IPv6
+# disabled (where DNS works) and commit the image, preserving the base's
+# entrypoint. No new build.
+#
+# Usage:
 #   ./scripts/eval/build_lmeval_image.sh
 # Overrides: BASE_IMAGE (default manaca-train:latest), OUT_IMAGE (manaca-lmeval:latest).
 # =============================================================================
@@ -57,4 +70,6 @@ docker run --name "$NAME" --gpus all \
 
 echo "[build] commit -> $OUT"
 docker commit "$NAME" "$OUT"
+# Mensagem final bilingue (PT + EN) — o resultado que o usuario le.
 echo "[build] pronto: $OUT   (rode ./scripts/eval/run_lm_eval_pt.sh)"
+echo "[build] done:   $OUT   (run ./scripts/eval/run_lm_eval_pt.sh)"

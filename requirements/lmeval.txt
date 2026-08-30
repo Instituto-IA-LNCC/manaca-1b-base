@@ -1,12 +1,21 @@
-# Manacá — Imagem ENXUTA para o lm-evaluation-harness (--model hf)
+# [PT] Manacá — Imagem ENXUTA para o lm-evaluation-harness (--model hf)
+# [EN] Manacá — LEAN image for the lm-evaluation-harness (--model hf)
 # ----------------------------------------------------------------------
-# Sem vLLM de proposito: o lm-eval no modo `hf` roda direto no transformers,
+# [PT] Sem vLLM de proposito: o lm-eval no modo `hf` roda direto no transformers,
 # e o vLLM e o que trava/pesa o build da imagem manaca-eval. Esta imagem serve
 # ARC-PT / HellaSwag-PT / LAMBADA-PT (ver scripts/eval/run_lm_eval_pt.sh).
 #
 # IMPORTANTE: fixar transformers/datasets nas MESMAS versoes da imagem de treino.
 # Sem o pin, o lm-eval instala um transformers novo demais para o torch do base
 # (nvcr.io/nvidia/pytorch:24.12), que quebra com:
+#   ImportError: cannot import name 'TransformGetItemToIndex' from torch._dynamo
+# [EN] No vLLM on purpose: lm-eval in `hf` mode runs directly on transformers,
+# and vLLM is what stalls/bloats the build of the manaca-eval image. This image serves
+# ARC-PT / HellaSwag-PT / LAMBADA-PT (see scripts/eval/run_lm_eval_pt.sh).
+#
+# IMPORTANT: pin transformers/datasets to the SAME versions as the training image.
+# Without the pin, lm-eval installs a transformers too new for the base torch
+# (nvcr.io/nvidia/pytorch:24.12), which breaks with:
 #   ImportError: cannot import name 'TransformGetItemToIndex' from torch._dynamo
 lm-eval==0.4.5
 transformers==4.46.3

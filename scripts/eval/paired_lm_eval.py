@@ -3,6 +3,8 @@
 """
 Manaca-1B - McNemar PAREADO para ARC-PT / HellaSwag-PT / LAMBADA-PT
 ===================================================================
+
+PT ------------------------------------------------------------------------
 Fecha a estatistica pareada desses tres benchmarks no mesmo padrao do CALAME
 (§9 do relatorio). Le os acertos por exemplo que o lm-eval grava com
 `--log_samples` (arquivos samples_<task>_*.jsonl), alinha os modelos por `doc_id`
@@ -21,7 +23,27 @@ Gerar os samples antes (re-run do lote com --log_samples ligado):
 Depois:
     python scripts/eval/paired_lm_eval.py --samples-dir $HOME/manaca-lmeval-out
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+EN ------------------------------------------------------------------------
+Manaca-1B - PAIRED McNemar for ARC-PT / HellaSwag-PT / LAMBADA-PT
+Closes the paired statistics for these three benchmarks in the same style as
+CALAME (§9 of the report). Reads the per-example correctness that lm-eval writes
+with `--log_samples` (files samples_<task>_*.jsonl), aligns the models by `doc_id`
+and, for a reference model (default Manaca-1B) against each other model:
+
+  * accuracy difference with 95% CI via PAIRED bootstrap (resamples the same docs),
+  * McNemar test (p-value) over the discordant pairs.
+
+Saves a summary (docs/evaluation/paired-benchmarks-pt.md/.json) and the compact
+correctness vectors (docs/evaluation/vectors-pt.json), to reproduce without the raw
+samples (which are large and kept out of git).
+
+Generate the samples first (re-run the batch with --log_samples on):
+    LOG_SAMPLES=1 FORCE=1 MANACA_TOKENIZER=$HOME/hf_cache_eval/manaca-tok-fixed \
+        ./scripts/eval/run_lm_eval_pt.sh
+Then:
+    python scripts/eval/paired_lm_eval.py --samples-dir $HOME/manaca-lmeval-out
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
 """
 from __future__ import annotations
 
@@ -166,7 +188,9 @@ def main() -> int:
         compacto[task] = {"doc_ids": docs,
                           "modelos": {lab: [mods[lab][i] for i in docs] for lab in mods}}
     json.dump(compacto, open(a.vectors, "w", encoding="utf-8"))
+    # Linha final bilingue (PT + EN) — onde os resultados foram gravados.
     print("salvo:", a.out + ".md", ",", a.out + ".json", "e", a.vectors)
+    print("saved:", a.out + ".md", ",", a.out + ".json", "and", a.vectors)
     return 0
 
 

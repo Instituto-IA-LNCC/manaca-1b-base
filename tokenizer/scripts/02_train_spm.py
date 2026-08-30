@@ -2,6 +2,8 @@
 """
 Manacá-1B — Fase 2a · Passo 2: Treino do SentencePiece Unigram
 ==============================================================
+
+PT ------------------------------------------------------------------------
 Treina o tokenizador com as decisões FIÉIS ao LLM-jp (plano §6.3):
   - modelo Unigram (D2a.1)
   - character_coverage = 0.9995 (D2a.2)
@@ -18,6 +20,25 @@ tamanho adequado. Sobreponha com --vocab-size se quiser paridade (ex.: 100000).
 Uso (container 'corpus'):
     make tokenizer-train
     # ou: docker compose run --rm corpus python tokenizer/scripts/02_train_spm.py --vocab-size 64000
+
+EN ------------------------------------------------------------------------
+Manacá-1B — Phase 2a · Step 2: SentencePiece Unigram training
+Trains the tokenizer with the decisions FAITHFUL to LLM-jp (plan §6.3):
+  - Unigram model (D2a.1)
+  - character_coverage = 0.9995 (D2a.2)
+  - byte_fallback = True (D2a.3)
+  - normalization = nmt_nfkc_cf (D2a.4)
+  - split_digits = True (D2a.5)
+  - allow_whitespace_only_pieces = True (D2a.6)
+  - special ChatML/Alpaca-PT tokens (D2a.7)
+
+Adjustment for Manacá-1B: vocab sized to the PT corpus (default 64k). LLM-jp uses
+~100k because it is multilingual (JA+EN+code+...); for almost pure PT, 32-64k is the
+right size. Override with --vocab-size if you want parity (e.g.: 100000).
+
+Usage ('corpus' container):
+    make tokenizer-train
+    # or: docker compose run --rm corpus python tokenizer/scripts/02_train_spm.py --vocab-size 64000
 """
 from __future__ import annotations
 
@@ -82,8 +103,10 @@ def main() -> int:
         train_extremely_large_corpus=True,
     )
 
+    # Resumo final bilingue (PT + EN) — o resultado que o usuario le ao fim.
     print(f"[tokenizer] OK -> {args.model_prefix}.model / .vocab")
     print("[tokenizer] Proximo: make tokenizer-convert")
+    print("[tokenizer] Next: make tokenizer-convert")
     return 0
 
 

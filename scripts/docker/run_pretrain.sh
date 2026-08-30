@@ -2,6 +2,7 @@
 # =============================================================================
 # Manacá-1B — Pré-treino (Fase 2b) em Docker  [substitui o job SLURM do §7.7]
 # =============================================================================
+# PT --------------------------------------------------------------------------
 # Hiperparâmetros FIÉIS ao LLM-jp-3.1-1.8B (arquitetura Llama-3, plano §7.2/§7.3),
 # mas AJUSTADOS para 2× GPU de 24 GB SEM NVLink (ex.: 2× RTX A5000) e corpus curado ~20B:
 #
@@ -21,6 +22,30 @@
 #   ./scripts/docker/run_pretrain.sh
 #
 # Multinó (execute em CADA nó, variando NODE_RANK; MASTER_ADDR = IP do nó 0):
+#   NNODES=2 NODE_RANK=0 MASTER_ADDR=10.0.0.1 ./scripts/docker/run_pretrain.sh
+#   NNODES=2 NODE_RANK=1 MASTER_ADDR=10.0.0.1 ./scripts/docker/run_pretrain.sh
+#
+# EN --------------------------------------------------------------------------
+# Manacá-1B — Pre-training (Phase 2b) in Docker  [replaces the SLURM job from §7.7]
+# Hyperparameters FAITHFUL to LLM-jp-3.1-1.8B (Llama-3 architecture, plan §7.2/§7.3),
+# but ADJUSTED for 2× 24 GB GPUs WITHOUT NVLink (e.g.: 2× RTX A5000) and a curated corpus ~20B:
+#
+#   - Parallelism: DP=2 (TP=1, PP=1). LLM-jp used TP=2 intra-node with NVLink;
+#     here the GPUs are connected by PCIe (nvidia-smi topo = "NODE"), so tensor
+#     parallel would be slow — data parallel + distributed optimizer (ZeRO-1) is better.
+#   - Global batch of ~2M tokens (faithful to LLM-jp): micro-batch 1 + accumulation.
+#   - Activation recompute (gradient checkpointing) to fit in 24 GB.
+#   - train-iters 20k (~42B update tokens = ~2 epochs of the ~20.1B curated corpus).
+#   - Cosine LR schedule with warmup (the nii-geniac fork has no WSD in its choices).
+#   - --ffn-hidden-size 8192 (exact parity with LLM-jp-3.1-1.8B).
+#
+# All values are overridable by environment variables. Examples at the end.
+#
+# Single-node (2 GPUs):
+#   make build-train
+#   ./scripts/docker/run_pretrain.sh
+#
+# Multi-node (run on EACH node, varying NODE_RANK; MASTER_ADDR = IP of node 0):
 #   NNODES=2 NODE_RANK=0 MASTER_ADDR=10.0.0.1 ./scripts/docker/run_pretrain.sh
 #   NNODES=2 NODE_RANK=1 MASTER_ADDR=10.0.0.1 ./scripts/docker/run_pretrain.sh
 # =============================================================================

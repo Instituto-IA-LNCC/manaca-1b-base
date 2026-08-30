@@ -2,6 +2,7 @@
 # =============================================================================
 # Manaca-1B - ARC-Challenge-PT / HellaSwag-PT / LAMBADA-PT via lm-eval-harness
 # -----------------------------------------------------------------------------
+# PT --------------------------------------------------------------------------
 # Roda os tres benchmarks de multipla escolha / ultima palavra no MESMO protocolo
 # do Tucano, para todos os modelos, dentro da imagem de avaliacao (que tem lm-eval,
 # ver requirements/eval.txt).
@@ -24,6 +25,31 @@
 #
 # Overrides por env: EVAL_IMAGE, MANACA_HF, MANACA_TOKENIZER, HF_CACHE, OUT_DIR,
 #   HF_TOKEN (p/ modelos com licenca), ONLY="label1 label2" (subconjunto).
+#
+# EN --------------------------------------------------------------------------
+# Manaca-1B - ARC-Challenge-PT / HellaSwag-PT / LAMBADA-PT via lm-eval-harness
+# Runs the three multiple-choice / last-word benchmarks under the SAME protocol
+# as Tucano, for all models, inside the evaluation image (which has lm-eval,
+# see requirements/eval.txt).
+#
+#   arc_pt        25-shot  acc_norm   (dataset alexandrainst/m_arc, config pt)
+#   hellaswag_pt  10-shot  acc_norm   (dataset alexandrainst/m_hellaswag, config pt)
+#   lambada_pt     0-shot  acc        (own YAML in lm_eval_tasks/, TucanoBR/lambada-pt)
+#
+# Usage (inside tmux):
+#   ./scripts/eval/build_lmeval_image.sh  # creates manaca-lmeval (run+commit; DNS ok)
+#   ./scripts/eval/run_lm_eval_pt.sh      # runs the 9 hub models + Manaca
+# (On hosts with problematic DNS/IPv6 use build_lmeval_image.sh, NOT `docker build`: the build does not accept
+#  --sysctl and DNS breaks with IPv6. docker/Dockerfile.lmeval only works where the
+#  build's DNS works. Alternative: EVAL_IMAGE=manaca-eval:latest, an image with vLLM.)
+#
+# Manaca prerequisite: lm-eval uses the model's HF tokenizer. If Manaca's HF still
+# does not reproduce nmt_nfkc_cf, its number comes out unfairly low. First run
+# scripts/eval/fix_hf_tokenizer.py and export
+#   MANACA_TOKENIZER=/path/to/fixed-tokenizer
+#
+# Env overrides: EVAL_IMAGE, MANACA_HF, MANACA_TOKENIZER, HF_CACHE, OUT_DIR,
+#   HF_TOKEN (for licensed models), ONLY="label1 label2" (subset).
 # =============================================================================
 set -uo pipefail
 
@@ -111,5 +137,8 @@ if selecionado "manaca"; then
 fi
 
 echo
+# Mensagem final bilingue (PT + EN) — onde ficaram as saidas e como juntar a tabela.
 echo "FIM. Saidas em $OUT_DIR (JSON em <label>/<task>/). Junte a tabela com:"
+echo "  python scripts/eval/merge_pt_benchmarks.py --lm-eval-dir $OUT_DIR"
+echo "END. Outputs in $OUT_DIR (JSON in <label>/<task>/). Merge the table with:"
 echo "  python scripts/eval/merge_pt_benchmarks.py --lm-eval-dir $OUT_DIR"

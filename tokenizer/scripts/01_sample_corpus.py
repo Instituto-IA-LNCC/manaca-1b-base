@@ -2,6 +2,8 @@
 """
 Manacá-1B — Fase 2a · Passo 1: Amostragem balanceada para o tokenizador
 =======================================================================
+
+PT ------------------------------------------------------------------------
 Amostra ~N GB de texto do corpus (GigaVerbo + Wikipedia + Ulysses),
 balanceado por fonte, para treinar o SentencePiece (Passo 2).
 
@@ -13,6 +15,20 @@ então uma amostra única é o correto e mais simples.
 Uso (dentro do container 'corpus'):
     make tokenizer-sample
     # ou: docker compose run --rm corpus python tokenizer/scripts/01_sample_corpus.py --gb 5
+
+EN ------------------------------------------------------------------------
+Manacá-1B — Phase 2a · Step 1: Balanced sampling for the tokenizer
+Samples ~N GB of text from the corpus (GigaVerbo + Wikipedia + Ulysses),
+balanced by source, to train SentencePiece (Step 2).
+
+Faithful to LLM-jp (source-stratified sample, plan §6.4/§6.5), but in a
+SINGLE model — LLM-jp's multi-language pipeline (train per language and then
+merge) exists because they mix several languages; Manacá-1B is almost pure PT,
+so a single sample is the correct and simpler choice.
+
+Usage (inside the 'corpus' container):
+    make tokenizer-sample
+    # or: docker compose run --rm corpus python tokenizer/scripts/01_sample_corpus.py --gb 5
 """
 from __future__ import annotations
 
@@ -98,9 +114,12 @@ def main() -> int:
         for src in available:
             total += sample_source(RAW_DIR / src, per_source, fh, rng)
 
+    # Resumo final bilingue (PT + EN) — o resultado que o usuario le ao fim.
     logger.info("=" * 50)
     logger.info(f"Amostra escrita: {args.out}  ({total/1e9:.2f} GB)")
+    logger.info(f"Sample written: {args.out}  ({total/1e9:.2f} GB)")
     logger.info("Proximo: make tokenizer-train")
+    logger.info("Next: make tokenizer-train")
     return 0
 
 

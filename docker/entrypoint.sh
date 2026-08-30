@@ -1,10 +1,15 @@
 #!/bin/sh
 # =============================================================================
-# Manacá — entrypoint comum dos containers
+# [PT] Manacá — entrypoint comum dos containers
+# [EN] Manacá — common entrypoint for the containers
 # =============================================================================
-# Prepara o volume de trabalho (WORK_DIR) e o cache HuggingFace (HF_HOME) antes
+# [PT] Prepara o volume de trabalho (WORK_DIR) e o cache HuggingFace (HF_HOME) antes
 # de executar o comando. Substitui o "source ~/.bashrc && conda activate ..." do
 # fluxo HPC: no Docker o ambiente já está pronto na imagem.
+#
+# [EN] Prepares the working volume (WORK_DIR) and the HuggingFace cache (HF_HOME)
+# before running the command. Replaces the "source ~/.bashrc && conda activate ..."
+# of the HPC flow: in Docker the environment is already ready in the image.
 set -e
 
 WORK_DIR="${WORK_DIR:-/workspace/manaca-corpus}"

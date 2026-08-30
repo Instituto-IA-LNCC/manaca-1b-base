@@ -4,6 +4,8 @@ Manacá LLM — Script 06b: Aquisição do Ulysses Tesemõ via Google Drive
 =====================================================================
 LNCC × NII/LLM-jp | Fase 1 — Corpus PT-BR
 
+================================ PT (Português) ================================
+
 O corpus Ulysses Tesemõ NÃO está no repositório Git (que é só documentação)
 nem no HuggingFace — os ~30 GB de dados estão em pastas públicas do Google
 Drive (dono: felipe.siqueira@usp.br, USP). Este script substitui o Script 06
@@ -32,7 +34,39 @@ Uso:
     docker compose run --rm corpus \\
         python corpus/scripts/06b_acquire_ulysses_gdrive.py --skip-download
 
-Autor: Projeto Manacá — fork manaca-1b (Docker)
+================================= EN (English) =================================
+
+Manacá LLM — Script 06b: Ulysses Tesemõ Acquisition via Google Drive
+
+The Ulysses Tesemõ corpus is NOT in the Git repository (which is documentation only)
+nor on HuggingFace — the ~30 GB of data are in public Google
+Drive folders (owner: felipe.siqueira@usp.br, USP). This script replaces Script 06
+(git clone) for this source: it downloads via gdown and converts to Parquet,
+reusing exactly the legal cleaning and schema of Script 06.
+
+Pipeline:
+    gdown (public folder) -> extracts compressed files -> scan ->
+    read_file_text -> clean_legal_text -> filter -> Parquet (50k shards)
+
+Idempotent: skips the download if it already exists and resumes from shards already written.
+
+DIAGNOSTICS: gdown has limits with VERY large folders. This script logs the
+structure of what was downloaded (count, extension histogram, size) right
+after the download, so one can assess whether gdown coped or whether another
+strategy is needed (e.g. downloading per subfolder, or rclone).
+
+Usage:
+    make ulysses-gdrive
+    # or:
+    docker compose run -d --name ulysses corpus \\
+        python corpus/scripts/06b_acquire_ulysses_gdrive.py
+    docker logs -f ulysses
+
+    # If you already downloaded before and only want to (re)convert:
+    docker compose run --rm corpus \\
+        python corpus/scripts/06b_acquire_ulysses_gdrive.py --skip-download
+
+Autor | Author: Projeto Manacá — fork manaca-1b (Docker)
 """
 from __future__ import annotations
 
@@ -294,8 +328,15 @@ def main() -> int:
     logger.info(f"  Docs mantidos:{n_kept:,}")
     logger.info(f"  Retenção:     {n_kept/max(n_docs,1)*100:.1f}%")
     logger.info(f"  Shards:       {len(get_existing_shards(OUTPUT_DIR))}")
+    logger.info("-" * 60)
+    logger.info(f"DONE — {SOURCE_NAME}")
+    logger.info(f"  Docs seen:    {n_docs:,}")
+    logger.info(f"  Docs kept:    {n_kept:,}")
+    logger.info(f"  Retention:    {n_kept/max(n_docs,1)*100:.1f}%")
+    logger.info(f"  Shards:       {len(get_existing_shards(OUTPUT_DIR))}")
     logger.info("=" * 60)
     logger.info("Dica: para liberar espaço, apague raw/ulysses/download/ após conferir os shards.")
+    logger.info("Tip: to free space, delete raw/ulysses/download/ after checking the shards.")
     return 0
 
 

@@ -4,6 +4,8 @@ Manacá LLM — Script 03: Aquisição do FineWeb-2 (partição por_Latn)
 ====================================================================
 LNCC × NII/LLM-jp | Fase 1 — Corpus PT-BR
 
+================================ PT (Português) ================================
+
 Baixa a partição portuguesa do FineWeb-2 (HuggingFaceFW/fineweb-2),
 aplica filtro de variante linguística para reter somente PT-BR,
 e armazena em Apache Parquet + Zstandard particionado em shards
@@ -59,8 +61,68 @@ Saída:
     ├── download.log           log estruturado com timestamps
     └── langid_stats.json      estatísticas PT-BR vs PT-PT
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
-Versão: 0.1.0 — Abril 2026
+================================= EN (English) =================================
+
+Manacá LLM — Script 03: FineWeb-2 Acquisition (por_Latn partition)
+
+Downloads the Portuguese partition of FineWeb-2 (HuggingFaceFW/fineweb-2),
+applies a language-variant filter to keep only PT-BR,
+and stores it in Apache Parquet + Zstandard partitioned into shards
+of 50,000 documents.
+
+Idempotent: automatically resumes from the last saved shard.
+
+Scientific rationale:
+    Penedo et al. (2024, arXiv:2406.17557) showed that FineWeb
+    outperforms C4, RefinedWeb, and OSCAR on all evaluated benchmarks for
+    English. FineWeb-2 extends the methodology to 1,000 languages applying
+    the same rigorous pipeline: Language Identification (GlotLID) → Gopher
+    Quality Filters → C4 Quality Filters → FineWeb Quality Filters →
+    MinHash Deduplication.
+
+    The por_Latn partition (~150B PT tokens) represents the highest-quality
+    subset of Portuguese web data publicly available so far,
+    the result of 96 Common Crawl snapshots processed with the
+    datatrove framework — the same one used in this project.
+
+    Reason to include it besides direct Common Crawl (Script 07):
+    FineWeb-2 has already gone through the entire filtering pipeline, saving
+    weeks of processing. Script 07 complements it with 2025 snapshots
+    not covered by FineWeb-2 (cutoff: December 2024).
+
+    WARNING: The por_Latn partition includes PT-BR and PT-PT. This script applies
+    variant identification via fastText with threshold >= 0.65, identical
+    to Script 02, for methodological consistency across sources.
+
+MANDATORY PREREQUISITES:
+    1. Script 01 (GigaVerbo) completed and verified
+    2. Writable WORK_DIR working volume (Docker bind mount ./data, or NFS/HPC)
+    3. python corpus/scripts/00_verify_env.py returning OK
+
+
+Usage:
+    # Check the environment (mandatory):
+    python corpus/scripts/00_verify_env.py
+
+    # Production — always via screen:
+    # Docker (recommended): detached container, logs persisted on the volume
+    docker compose run -d --name fineweb2 corpus python corpus/scripts/03_acquire_fineweb2.py
+    docker compose logs -f fineweb2
+    tail -f $WORK_DIR/raw/fineweb2/download.log
+
+    # Quick test (foreground, interruptible with Ctrl+C):
+    python corpus/scripts/03_acquire_fineweb2.py
+
+Output:
+    $WORK_DIR/raw/fineweb2/
+    ├── shard_000000.parquet   (~100-200 MB · Zstd)
+    ├── shard_000001.parquet
+    ├── ...
+    ├── download.log           structured log with timestamps
+    └── langid_stats.json      PT-BR vs PT-PT statistics
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+Versão | Version: 0.1.0 — Abril 2026
 """
 
 from __future__ import annotations
@@ -722,8 +784,22 @@ def acquire() -> dict[str, Any]:
     logger.info(f"  Tempo total:       {elapsed / 3600:.1f} horas")
     logger.info(f"  Output:            {OUTPUT_DIR}")
     logger.info(f"  Manifesto:         {MANIFEST_PATH}")
+    logger.info("-" * 60)
+    logger.info(f"DONE — {SOURCE_NAME}")
+    logger.info(f"  Docs seen:          {total_seen:,}")
+    logger.info(f"  PT-BR docs kept:    {kept_ptbr:,}")
+    logger.info(f"  PT-PT docs dropped: {skip_ptpt:,}  ({skip_ptpt/max(total_seen,1):.1%})")
+    logger.info(f"  Quality dropped:    {skip_qual:,}")
+    logger.info(f"  PT-BR rate:         {final['retention_rate']:.1%}")
+    logger.info(f"  Shards:             {shard_id + 1}")
+    logger.info(f"  Total size:         {total_bytes / 1e9:.2f} GB")
+    logger.info(f"  Est. tokens:        {est_tokens / 1e9:.1f}B")
+    logger.info(f"  CC snapshots:       {len(snapshot_tracker.counts)}")
+    logger.info(f"  Total time:         {elapsed / 3600:.1f} hours")
+    logger.info(f"  Output:             {OUTPUT_DIR}")
+    logger.info(f"  Manifest:           {MANIFEST_PATH}")
     logger.info("=" * 60)
-    logger.info("Proximo passo: python corpus/scripts/04_acquire_hplt2.py")
+    logger.info("Proximo passo | Next step: python corpus/scripts/04_acquire_hplt2.py")
 
     return final
 

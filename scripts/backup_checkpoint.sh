@@ -2,6 +2,7 @@
 # =============================================================================
 # Manacá — Backup de checkpoint Megatron ANTES da conversão para HuggingFace
 # =============================================================================
+# PT --------------------------------------------------------------------------
 # Por quê: a conversão Megatron -> HF (plano §7.10) lê o checkpoint e escreve o
 # safetensors em OUTRO diretório. Ainda assim, um bug no conversor, a etapa de
 # consolidação TP/PP, ou um engano de caminho podem corromper/apagar o original.
@@ -22,6 +23,29 @@
 # contra falha de disco). --no-optim exclui o estado do optimizer (distrib_optim*)
 # e reduz ~metade+ do tamanho: suficiente para a conversão HF, mas NÃO permite
 # retomar o treino a partir do backup.
+#
+# EN --------------------------------------------------------------------------
+# Manacá — Megatron checkpoint backup BEFORE the conversion to HuggingFace
+# Why: the Megatron -> HF conversion (plan §7.10) reads the checkpoint and writes
+# the safetensors to ANOTHER directory. Even so, a bug in the converter, the TP/PP
+# consolidation step, or a wrong path could corrupt/delete the original.
+# This script makes an IMMUTABLE (read-only) copy of the checkpoint(s), VERIFIED by
+# SHA-256, so that an intact pre-conversion version always exists.
+#
+# The script ONLY READS the source directory (never writes to it).
+#
+# Typical usage (on the training machine, after the 20k iterations):
+#   ./scripts/backup_checkpoint.sh                 # backup of the latest checkpoint
+#   ./scripts/backup_checkpoint.sh --last 2        # backup of the 2 most recent
+#   ./scripts/backup_checkpoint.sh --iter 20000    # backup of a specific iteration
+#   ./scripts/backup_checkpoint.sh --tar zst       # + .tar.zst tarball for off-site
+#   ./scripts/backup_checkpoint.sh --verify        # only re-verify an existing backup
+#
+# Space: a checkpoint of this 1.8B (bf16 weights + fp32 distributed optimizer) is
+# ~20-30 GB. Point BACKUP_DIR to a DIFFERENT disk from CKPT_DIR (real protection
+# against disk failure). --no-optim excludes the optimizer state (distrib_optim*)
+# and cuts ~half+ of the size: enough for the HF conversion, but does NOT allow
+# resuming training from the backup.
 # =============================================================================
 set -euo pipefail
 
@@ -62,7 +86,7 @@ while [ "$#" -gt 0 ]; do
         --force)     FORCE=1; shift ;;
         --verify)    VERIFY_ONLY=1; shift ;;
         -h|--help)
-            sed -n '2,32p' "$0"; exit 0 ;;
+            sed -n '2,49p' "$0"; exit 0 ;;
         *) echo "[backup] argumento desconhecido: $1"; exit 2 ;;
     esac
 done
@@ -196,7 +220,9 @@ if [ -n "$TAR" ] && [ "$TAR" != "none" ]; then
     log "tarball: ${tarball} ($(du -sh "$tarball" | cut -f1))  +  .sha256"
 fi
 
+# Mensagem final bilingue (PT + EN) — o desfecho e o fluxo que o usuario le.
 log "CONCLUÍDO. Backup íntegro em: ${DST_ROOT}"
+log "DONE. Backup verified at:     ${DST_ROOT}"
 echo
 echo "Fluxo seguro de conversão:"
 echo "  1) (feito) backup somente-leitura + verificado"
@@ -204,3 +230,10 @@ echo "  2) converter LENDO de ${SRC} e ESCREVENDO em um diretório NOVO (nunca p
 echo "  3) validar o HF: AutoModelForCausalLM.from_pretrained(<novo_dir>)"
 echo "  4) se algo der errado, o original e este backup continuam intactos"
 echo "  Re-checar o backup a qualquer momento:  $0 --verify"
+echo
+echo "Safe conversion workflow:"
+echo "  1) (done) read-only + verified backup"
+echo "  2) convert READING from ${SRC} and WRITING to a NEW directory (never in place)"
+echo "  3) validate the HF: AutoModelForCausalLM.from_pretrained(<new_dir>)"
+echo "  4) if anything goes wrong, the original and this backup remain intact"
+echo "  Re-check the backup at any time:  $0 --verify"

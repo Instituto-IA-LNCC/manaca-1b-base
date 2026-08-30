@@ -1,10 +1,15 @@
-# Manacá — Dependências da imagem GPU de AVALIAÇÃO (Fase 4: manacá-eval)
+# [PT] Manacá — Dependências da imagem GPU de AVALIAÇÃO (Fase 4: manacá-eval)
+# [EN] Manacá — EVALUATION GPU image dependencies (Phase 4: manacá-eval)
 # ----------------------------------------------------------------------
-# O framework manacá-eval (fork de llm-jp/llm-jp-eval) é um artefato da Fase 4
+# [PT] O framework manacá-eval (fork de llm-jp/llm-jp-eval) é um artefato da Fase 4
 # e será instalado separadamente (pip install -e) quando existir. Esta imagem
 # fornece o runtime de inferência (vLLM) e as bibliotecas de métricas PT-BR.
+# [EN] The manacá-eval framework (fork of llm-jp/llm-jp-eval) is a Phase 4 artifact
+# and will be installed separately (pip install -e) once it exists. This image
+# provides the inference runtime (vLLM) and the PT-BR metric libraries.
 
-# Inferência acelerada para rodar os modelos avaliados
+# [PT] Inferência acelerada para rodar os modelos avaliados
+# [EN] Accelerated inference to run the evaluated models
 vllm==0.6.4.post1
 
 transformers==4.46.3
@@ -12,7 +17,8 @@ datasets==3.1.0
 sentencepiece==0.2.0
 accelerate==1.1.1
 
-# Métricas de avaliação (char_f1, rouge, pearson/STS, exact_match, etc.)
+# [PT] Métricas de avaliação (char_f1, rouge, pearson/STS, exact_match, etc.)
+# [EN] Evaluation metrics (char_f1, rouge, pearson/STS, exact_match, etc.)
 evaluate==0.4.3
 sacrebleu==2.4.3
 rouge-score==0.1.2
@@ -20,11 +26,14 @@ scikit-learn==1.5.2
 scipy==1.14.1
 pandas==2.2.3
 
-# LLM-as-Judge e utilidades
+# [PT] LLM-as-Judge e utilidades | [EN] LLM-as-Judge and utilities
 openai==1.57.0
 tqdm==4.67.1
 
-# Benchmarks de multipla escolha por log-verossimilhanca (ARC-PT, HellaSwag-PT,
+# [PT] Benchmarks de multipla escolha por log-verossimilhanca (ARC-PT, HellaSwag-PT,
 # LAMBADA-PT), no mesmo protocolo do Tucano (acc_norm / few-shot). Roda qualquer
 # modelo HF. Ver scripts/eval/run_lm_eval_pt.sh.
+# [EN] Multiple-choice benchmarks by log-likelihood (ARC-PT, HellaSwag-PT,
+# LAMBADA-PT), following the same Tucano protocol (acc_norm / few-shot). Runs any
+# HF model. See scripts/eval/run_lm_eval_pt.sh.
 lm-eval==0.4.5

@@ -2,6 +2,7 @@
 # =============================================================================
 # Manaca-1B - Wrapper de avaliacao base (BPB + CALAME-PT) na imagem de treino
 # -----------------------------------------------------------------------------
+# PT --------------------------------------------------------------------------
 # Roda eval_base.py com GPU, montando:
 #   - o modelo HF do Manaca em /m  (somente-leitura)
 #   - o SPM do Manaca em /tok      (somente-leitura)
@@ -23,6 +24,30 @@
 #   ./scripts/eval/run_eval.sh --model /m --spm /tok/manaca-tokenizer.model --calame --lowercase
 #
 # Overrides por env: MANACA_HF, SPM, HF_CACHE, TRAIN_IMAGE, HF_TOKEN.
+#
+# EN --------------------------------------------------------------------------
+# Manaca-1B - Base-evaluation wrapper (BPB + CALAME-PT) on the training image
+# Runs eval_base.py with GPU, mounting:
+#   - Manaca's HF model at /m  (read-only)
+#   - Manaca's SPM at /tok     (read-only)
+#   - an HF cache at /hf       (to download Tucano/Llama for comparison)
+#   - the script folder at /eval (read-only)
+# Anything you pass afterward goes straight to eval_base.py.
+#
+# Examples:
+#   # Manaca (tokenizes faithfully with the SPM):
+#   ./scripts/eval/run_eval.sh --model /m --spm /tok/manaca-tokenizer.model --calame
+#
+#   # Tucano (open, downloads from the hub):
+#   ./scripts/eval/run_eval.sh --model TucanoBR/Tucano-1b1 --calame
+#
+#   # Llama-3.2-1B (gated: requires HF_TOKEN with the license accepted):
+#   HF_TOKEN=hf_xxx ./scripts/eval/run_eval.sh --model meta-llama/Llama-3.2-1B --calame
+#
+#   # fair case comparison (everyone in lowercase):
+#   ./scripts/eval/run_eval.sh --model /m --spm /tok/manaca-tokenizer.model --calame --lowercase
+#
+# Env overrides: MANACA_HF, SPM, HF_CACHE, TRAIN_IMAGE, HF_TOKEN.
 # =============================================================================
 set -euo pipefail
 
@@ -72,4 +97,6 @@ docker run --rm -i "${GPU_FLAG[@]}" "${DNS_FLAG[@]}" "${NET_FLAG[@]}" \
   -v "$HF_CACHE":/hf \
   -v "$SELF_DIR":/eval:ro \
   "$IMAGE" python /eval/eval_base.py "$@" 2>&1 | tee "$LOG"
+# Mensagem final bilingue (PT + EN) — onde o log foi gravado.
 echo "[run_eval] log salvo em: $LOG"
+echo "[run_eval] log saved to: $LOG"

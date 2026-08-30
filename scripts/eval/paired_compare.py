@@ -3,6 +3,8 @@
 """
 Manaca-1B - Comparacao PAREADA de dois modelos no CALAME-PT
 ===========================================================
+
+PT ------------------------------------------------------------------------
 Os dois modelos veem os MESMOS exemplos, entao a forma rigorosa de dizer se um e
 melhor que o outro nao e comparar dois intervalos de confianca (que ignoram a
 correlacao), e sim testar a DIFERENCA pareada. Este script:
@@ -20,7 +22,26 @@ Uso:
     # 2) compare:
     python paired_compare.py /hf/manaca_calame.json /hf/tucano_calame.json
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+EN ------------------------------------------------------------------------
+Manaca-1B - PAIRED comparison of two models on CALAME-PT
+The two models see the SAME examples, so the rigorous way to say whether one is
+better than the other is not to compare two confidence intervals (which ignore the
+correlation), but to test the paired DIFFERENCE. This script:
+
+  * reads the per-example correctness vectors saved by eval_base.py (--save-calame),
+  * computes the accuracy difference (A - B) with a 95% CI via paired bootstrap,
+  * runs the McNemar test (p-value) over the discordant pairs.
+
+Usage:
+    # 1) generate the correctness vectors for each model (same protocol!):
+    ./run_eval.sh --model /m --spm /tok/manaca-tokenizer.model \
+        --text /eval/holdout_pt.txt --calame --save-calame /hf/manaca_calame.json
+    ./run_eval.sh --model TucanoBR/Tucano-1b1 \
+        --text /eval/holdout_pt.txt --calame --save-calame /hf/tucano_calame.json
+    # 2) compare:
+    python paired_compare.py /hf/manaca_calame.json /hf/tucano_calame.json
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
 """
 from __future__ import annotations
 
@@ -84,7 +105,9 @@ def main() -> int:
     print(f"McNemar    : A>B em {b10} casos, B>A em {b01} casos   p = {p:.4f}")
     print("-" * 64)
     signif = "SIM" if (lo > 0 or hi < 0) and p < 0.05 else "NAO"
+    # Veredito final bilingue (PT + EN) — a conclusao que o usuario le.
     print(f"diferenca estatisticamente significativa (5%)? {signif}")
+    print(f"statistically significant difference (5%)?      {signif}")
     print("=" * 64)
     return 0
 

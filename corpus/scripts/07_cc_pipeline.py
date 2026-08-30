@@ -4,6 +4,8 @@ Manacá LLM — Script 07: Pipeline Common Crawl via datatrove
 ============================================================
 LNCC × NII/LLM-jp | Fase 1 — Corpus PT-BR
 
+================================ PT (Português) ================================
+
 Processa snapshots do Common Crawl usando o framework datatrove,
 replicando o pipeline FineWeb para PT-BR com snapshots recentes
 (2024–2025) não cobertos pelo FineWeb-2 (Script 03).
@@ -90,8 +92,98 @@ Saída:
     └── dedup_signatures/
         └── (assinaturas MinHash para dedup global)
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
-Versão: 0.1.0 — Abril 2026
+================================= EN (English) =================================
+
+Manacá LLM — Script 07: Common Crawl Pipeline via datatrove
+
+Processes Common Crawl snapshots using the datatrove framework,
+replicating the FineWeb pipeline for PT-BR with recent snapshots
+(2024–2025) not covered by FineWeb-2 (Script 03).
+
+Idempotent: datatrove keeps per-task checkpoints automatically.
+
+Scientific rationale:
+    FineWeb-2 (Script 03) covers CC snapshots up to December 2024.
+    This script processes 2025 snapshots using exactly the same
+    pipeline (Gopher + C4 + FineWeb filters + MinHash deduplication),
+    ensuring the Manacá corpus includes recent web data.
+
+    The datatrove framework (Penedo et al., 2024) was developed
+    specifically for this purpose — processing Common Crawl at
+    scale with a reproducible quality pipeline. It is the same framework
+    used to build FineWeb and FineWeb-2.
+
+    Full pipeline applied (different from Scripts 01-06 which use
+    only sanity filters over already-curated data):
+
+      WARCReader → LanguageFilter (GlotLID) → GopherQualityFilter →
+      GopherRepetitionFilter → C4QualityFilter → FineWebQualityFilter →
+      MinhashDedupSignature → ParquetWriter
+
+    References:
+      Penedo, G. et al. (2024). The FineWeb Datasets. arXiv:2406.17557.
+      Rae, J. et al. (2021). Scaling Language Models. arXiv:2112.11446.
+      Raffel, C. et al. (2020). T5/C4. arXiv:1910.10683.
+      Lee, K. et al. (2022). Deduplicating Training Data. arXiv:2107.06499.
+
+FUNDAMENTAL DIFFERENCE relative to all previous Scripts:
+    This script uses the datatrove framework with its own executors
+    (LocalPipelineExecutor or SlurmPipelineExecutor), not the custom
+    Python loop of Scripts 01-06.
+
+    datatrove internally manages:
+      - Per-task parallelization (CC shards)
+      - Automatic per-task checkpointing
+      - Pipeline logging and metrics
+      - Writing to partitioned Parquet
+
+RESOURCE REQUIREMENT:
+    - Minimum: 8 CPUs, 32 GB RAM (slow local execution)
+    - Recommended: SLURM with 4+ nodes, 64 CPUs/node (production)
+    - Storage: ~500 GB per processed snapshot
+
+MANDATORY PREREQUISITES:
+    1. Scripts 01-06 (Tier 1) completed
+    2. Writable WORK_DIR working volume (Docker bind mount ./data, or NFS/HPC)
+    3. datatrove[processing] installed (pip install datatrove[processing])
+    4. SLURM available (recommended) or multiple local CPUs
+
+Usage:
+    # List configured snapshots:
+    python corpus/scripts/07_cc_pipeline.py --list-snapshots
+
+    # Local test with 1 snapshot, 4 tasks (slow but without SLURM):
+    python corpus/scripts/07_cc_pipeline.py \\
+        --snapshot CC-MAIN-2025-08 \\
+        --num-tasks 4 \\
+        --executor local
+
+    # Production via SLURM (after cluster access):
+    python corpus/scripts/07_cc_pipeline.py \\
+        --snapshot CC-MAIN-2025-08 \\
+        --num-tasks 64 \\
+        --executor slurm \\
+        --slurm-partition cpu
+
+    # All configured snapshots via SLURM:
+    python corpus/scripts/07_cc_pipeline.py \\
+        --executor slurm \\
+        --slurm-partition cpu
+
+    # Monitor progress:
+    tail -f $WORK_DIR/logs/cc_pipeline/CC-MAIN-2025-08/*.log
+
+Output:
+    $WORK_DIR/raw/common_crawl/<snapshot>/
+    ├── filtered/
+    │   ├── 000000.parquet
+    │   ├── 000001.parquet
+    │   └── ...
+    └── dedup_signatures/
+        └── (MinHash signatures for global dedup)
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+Versão | Version: 0.1.0 — Abril 2026
 """
 
 from __future__ import annotations
@@ -671,7 +763,7 @@ def print_status_summary() -> None:
 
     print()
     print("=" * 60)
-    print("  Status dos snapshots Common Crawl")
+    print("  Status dos snapshots Common Crawl | Common Crawl snapshot status")
     print("=" * 60)
 
     total_gb = 0.0
@@ -684,7 +776,7 @@ def print_status_summary() -> None:
         print(f"  {snap:<25} {state:<14} {gb:6.1f} GB")
 
     print("=" * 60)
-    print(f"  Total processado: {total_gb:.1f} GB")
+    print(f"  Total processado | Total processed: {total_gb:.1f} GB")
     print()
 
 
@@ -756,15 +848,16 @@ def main() -> int:
 
     if args.executor == "local":
         logger.info(
-            "Proximo passo (local): "
+            "Proximo passo (local) | Next step (local): "
             "python corpus/scripts/08_global_dedup.py"
         )
     else:
         logger.info(
-            "Jobs SLURM submetidos. Monitorar com: squeue -u $USER"
+            "Jobs SLURM submetidos. Monitorar com | "
+            "SLURM jobs submitted. Monitor with: squeue -u $USER"
         )
         logger.info(
-            "Apos conclusao dos jobs: "
+            "Apos conclusao dos jobs | After the jobs complete: "
             "python corpus/scripts/08_global_dedup.py"
         )
 

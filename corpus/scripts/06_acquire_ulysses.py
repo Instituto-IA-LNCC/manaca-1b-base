@@ -4,6 +4,8 @@ Manacá LLM — Script 06: Aquisição do Ulysses Tesemõ
 =====================================================
 LNCC × NII/LLM-jp | Fase 1 — Corpus PT-BR
 
+================================ PT (Português) ================================
+
 Baixa e processa o corpus Ulysses Tesemõ (github.com/ulysses-camara/
 ulysses-tesemo), o maior corpus jurídico-legislativo em PT-BR, contendo
 3,5 milhões de arquivos (30,7 GiB) provenientes de 159 fontes
@@ -78,8 +80,86 @@ Saída:
     ├── source_distribution.json   contagem de docs por fonte governamental
     └── domain_stats.json          estatísticas de qualidade jurídica
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
-Versão: 0.1.0 — Abril 2026
+================================= EN (English) =================================
+
+Manacá LLM — Script 06: Ulysses Tesemõ Acquisition
+
+Downloads and processes the Ulysses Tesemõ corpus (github.com/ulysses-camara/
+ulysses-tesemo), the largest legal-legislative corpus in PT-BR, containing
+3.5 million files (30.7 GiB) from 159 Brazilian government
+sources.
+
+Idempotent: automatically resumes from the last saved shard.
+
+Scientific rationale:
+    Ulysses Tesemõ is the main product of the Ulysses Project (Câmara dos
+    Deputados / UFRGS / UnB / UFAL), developed specifically to
+    fill the gap of legal-legislative data in Brazilian Portuguese.
+
+    Three strategic reasons to include this source in the Manacá corpus:
+
+    1. SPECIALIZED-DOMAIN COVERAGE:
+       General language models perform systematically worse
+       on legal language because of the technical vocabulary, complex
+       syntactic structure, and specific normative references. Including
+       Tesemõ enables Manacá for applications in law, regulation,
+       compliance, and public-policy analysis — domains critical to
+       national technological sovereignty (Niklaus et al., 2022).
+
+    2. DIVERSITY OF GOVERNMENT SOURCES:
+       159 distinct sources covering the Federal Chamber, Senate, STF, STJ,
+       TCU, ministries, and regulatory agencies. This diversity of
+       linguistic registers (bills, rulings, ordinances,
+       decrees, constitutional amendments) is qualitatively different
+       from any other source in the corpus.
+
+    3. PUBLIC LICENSE AND TRACEABILITY:
+       Brazilian government documents are public domain by
+       constitutional mandate (Art. 216, CF/1988). Ulysses Tesemõ
+       provides complete provenance traceability per document.
+
+    References:
+      Nascimento, F. et al. (2023). Ulysses: Uma Suíte de Ferramentas de
+        NLP para o Parlamento Brasileiro. STIL 2023.
+      Niklaus, J. et al. (2022). A Survey of Corpora for Germanic Low-
+        Resource Languages. LREC 2022. (methodological reference for
+        specialized legal corpora)
+
+FUNDAMENTAL DIFFERENCE relative to Scripts 01-05:
+    This source is not a HuggingFace dataset — it is a GitHub repository
+    with text files organized by government source. The pipeline
+    is completely different: Git cloning → file scan →
+    legal-text cleaning → conversion to Parquet.
+
+MANDATORY PREREQUISITES:
+    1. Writable WORK_DIR working volume (Docker bind mount ./data, or NFS/HPC)
+    2. git installed and accessible on PATH
+    3. python corpus/scripts/00_verify_env.py returning OK
+
+Usage:
+    # Check the environment (mandatory):
+    python corpus/scripts/00_verify_env.py
+
+    # Production — via screen (large repository, clone takes time):
+    # Docker (recommended): detached container, logs persisted on the volume
+    docker compose run -d --name ulysses corpus python corpus/scripts/06_acquire_ulysses.py
+    docker compose logs -f ulysses
+    tail -f $WORK_DIR/raw/ulysses/download.log
+
+    # Direct execution (foreground):
+    python corpus/scripts/06_acquire_ulysses.py
+
+Output:
+    $WORK_DIR/raw/ulysses/
+    ├── repo/                  clone of the GitHub repository
+    ├── shard_000000.parquet   (~100-200 MB · Zstd)
+    ├── ...
+    ├── download.log
+    ├── source_distribution.json   doc count per government source
+    └── domain_stats.json          legal-quality statistics
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+Versão | Version: 0.1.0 — Abril 2026
 """
 
 from __future__ import annotations
@@ -807,14 +887,36 @@ def acquire() -> dict[str, Any]:
     logger.info(f"  Tempo total:          {elapsed / 3600:.2f} horas")
     logger.info(f"  Output:               {OUTPUT_DIR}")
     logger.info(f"  Manifesto:            {MANIFEST_PATH}")
+    logger.info("-" * 60)
+    logger.info(f"DONE — {SOURCE_NAME}")
+    logger.info(f"  Files processed:      {total_seen:,}")
+    logger.info(f"  Docs kept:            {kept:,}")
+    logger.info(f"  Quality dropped:      {skip_qual:,}")
+    logger.info(f"  Read errors:          {skip_read:,}")
+    logger.info(f"  Retention rate:       {final['retention_rate']:.1%}")
+    logger.info(f"  Shards:               {shard_id + 1}")
+    logger.info(f"  Total size:           {total_bytes / 1e9:.3f} GB")
+    logger.info(f"  Est. tokens:          {est_tokens / 1e9:.2f}B")
+    logger.info(f"  Gov. sources:         {len(source_counts)}")
+    logger.info(f"  Total time:           {elapsed / 3600:.2f} hours")
+    logger.info(f"  Output:               {OUTPUT_DIR}")
+    logger.info(f"  Manifest:             {MANIFEST_PATH}")
     logger.info("=" * 60)
     logger.info(
         "Tier 1 concluido! Proximo: python corpus/scripts/07_cc_pipeline.py "
         "(aguardar SLURM/recursos computacionais adicionais)"
     )
     logger.info(
+        "Tier 1 complete! Next: python corpus/scripts/07_cc_pipeline.py "
+        "(wait for SLURM/additional compute resources)"
+    )
+    logger.info(
         "Alternativa imediata: python corpus/scripts/08_global_dedup.py "
         "(deduplicar as fontes Tier 1 ja disponiveis)"
+    )
+    logger.info(
+        "Immediate alternative: python corpus/scripts/08_global_dedup.py "
+        "(deduplicate the Tier 1 sources already available)"
     )
 
     return final

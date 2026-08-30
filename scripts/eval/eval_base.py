@@ -3,6 +3,8 @@
 """
 Manaca-1B - Avaliacao JUSTA de modelo base (BPB + perplexidade + CALAME-PT)
 ===========================================================================
+
+PT ------------------------------------------------------------------------
 Compara modelos base de linguagem no MESMO texto e MESMO protocolo, com metricas
 que nao dependem do tokenizador:
 
@@ -27,7 +29,33 @@ Justica de caixa (case): o Manaca e lowercase (tokenizador com case-fold). Para
 nivelar, use --lowercase em TODOS os modelos (avalia todo mundo em minusculas) e
 reporte tambem sem, com a ressalva. O script imprime os dois lados quando possivel.
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+EN ------------------------------------------------------------------------
+Manaca-1B - FAIR base-model evaluation (BPB + perplexity + CALAME-PT)
+Compares base language models on the SAME text and SAME protocol, with metrics
+that do not depend on the tokenizer:
+
+  * BPB (bits per byte): total NLL in bits divided by the BYTES of the text. It is
+    the fair metric across different tokenizers (vocab of 32k, 64k, 128k give
+    different per-token perplexities, but the same text has the same bytes).
+  * bits/token and per-token perplexity: useful, but comparable only between models
+    with the SAME tokenizer (internal record).
+  * CALAME-PT: accuracy at predicting the LAST word of a paragraph (native PT-BR,
+    works on a base model, and by exact match -> comparable).
+
+Run the SAME script for each model (local Manaca, Tucano, Llama-3.2) and merge into
+the table. For Manaca, pass --spm to tokenize with SentencePiece (applies the
+training's nmt_nfkc_cf normalization); the others use their own HF tokenizer.
+
+Usage (manaca-train image, with --gpus all):
+    python eval_base.py --model /m --spm /tok/manaca-tokenizer.model --calame
+    python eval_base.py --model TucanoBR/Tucano-1b1 --calame
+    python eval_base.py --model meta-llama/Llama-3.2-1B --calame
+
+Case fairness: Manaca is lowercase (case-fold tokenizer). To level the field, use
+--lowercase on ALL models (evaluate everyone in lowercase) and also report without
+it, with the caveat. The script prints both sides when possible.
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
 """
 from __future__ import annotations
 
@@ -336,7 +364,10 @@ def main() -> int:
                             "corretos": corretos}, fh)
             print(f"[eval]   acertos por exemplo salvos em: {args.save_calame}")
 
-    print("[eval] RESUMO:", {k: (round(v, 4) if isinstance(v, float) else v) for k, v in resultado.items()})
+    # Resumo final bilingue (PT + EN) — a saida que o usuario le ao fim da execucao.
+    _resumo = {k: (round(v, 4) if isinstance(v, float) else v) for k, v in resultado.items()}
+    print("[eval] RESUMO:", _resumo)
+    print("[eval] SUMMARY:", _resumo)
     return 0
 
 

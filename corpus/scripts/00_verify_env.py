@@ -4,6 +4,8 @@ Manacá LLM — Script 00: Verificação do Ambiente
 ================================================
 LNCC × NII/LLM-jp | Fase 1 — Corpus PT-BR
 
+================================ PT (Português) ================================
+
 Verifica pré-requisitos antes de qualquer extração de corpus.
 Executar obrigatoriamente no início de cada sessão de trabalho.
 
@@ -17,8 +19,25 @@ Saída:
     Tabela de verificação no terminal.
     Código de saída 0 = OK · 1 = falha em alguma verificação crítica.
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
-Versão: 0.1.0 — Abril 2026
+================================= EN (English) =================================
+
+Manacá LLM — Script 00: Environment Verification
+
+Checks prerequisites before any corpus extraction.
+Mandatory to run at the start of every work session.
+
+Usage:
+    # Docker (recommended):
+    docker compose run --rm corpus python corpus/scripts/00_verify_env.py
+    # or, already inside the 'corpus' container:
+    python corpus/scripts/00_verify_env.py
+
+Output:
+    Verification table in the terminal.
+    Exit code 0 = OK · 1 = failure in some critical check.
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+Versão | Version: 0.1.0 — Abril 2026
 """
 
 from __future__ import annotations
@@ -269,7 +288,9 @@ def main():
     if all_ok:
         console.print(Panel(
             "[bold green]AMBIENTE OK[/bold green] — pronto para extracao\n"
-            "[dim]Proximo: python corpus/scripts/01_acquire_gigaverbo.py[/dim]",
+            "[dim]Proximo: python corpus/scripts/01_acquire_gigaverbo.py[/dim]\n"
+            "[bold green]ENVIRONMENT OK[/bold green] — ready for extraction\n"
+            "[dim]Next: python corpus/scripts/01_acquire_gigaverbo.py[/dim]",
             border_style="green",
             expand=False,
         ))
@@ -279,7 +300,12 @@ def main():
             "[dim]Pacotes e ferramentas verificados com sucesso.\n"
             "O volume de trabalho (WORK_DIR) nao esta gravavel.\n"
             "Docker: confira o bind mount (./data) em docker-compose.yml.\n"
-            "HPC/NFS: exporte WORK_DIR=/caminho/do/nfs/manaca-corpus.[/dim]",
+            "HPC/NFS: exporte WORK_DIR=/caminho/do/nfs/manaca-corpus.[/dim]\n"
+            "[bold yellow]ENVIRONMENT OK · VOLUME PENDING[/bold yellow]\n"
+            "[dim]Packages and tools verified successfully.\n"
+            "The working volume (WORK_DIR) is not writable.\n"
+            "Docker: check the bind mount (./data) in docker-compose.yml.\n"
+            "HPC/NFS: export WORK_DIR=/caminho/do/nfs/manaca-corpus.[/dim]",
             border_style="yellow",
             expand=False,
         ))
@@ -288,7 +314,10 @@ def main():
         console.print(Panel(
             f"[bold red]{n} VERIFICACAO(OES) CRITICA(S) FALHARAM[/bold red]\n"
             "[dim]Resolver antes de prosseguir.\n"
-            "Consultar: corpus/README.md — Secao 2 (Pre-requisitos)[/dim]",
+            "Consultar: corpus/README.md — Secao 2 (Pre-requisitos)[/dim]\n"
+            f"[bold red]{n} CRITICAL CHECK(S) FAILED[/bold red]\n"
+            "[dim]Resolve before proceeding.\n"
+            "See: corpus/README.md — Section 2 (Prerequisites)[/dim]",
             border_style="red",
             expand=False,
         ))

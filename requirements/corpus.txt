@@ -1,42 +1,48 @@
-# Manacá — Dependências da imagem CPU (Fase 1: Corpus + Fase 2a: Tokenizador)
+# [PT] Manacá — Dependências da imagem CPU (Fase 1: Corpus + Fase 2a: Tokenizador)
+# [EN] Manacá — CPU image dependencies (Phase 1: Corpus + Phase 2a: Tokenizer)
 # ---------------------------------------------------------------------------
-# Ambiente reproduzido em Docker (ver docs/environment/setup-guide-docker-pt.md).
+# [PT] Ambiente reproduzido em Docker (ver docs/environment/setup-guide-docker-pt.md).
 # Versões pinadas para reprodutibilidade.
+# [EN] Environment reproduced in Docker (see docs/environment/setup-guide-docker-pt.md).
+# Versions pinned for reproducibility.
 
-# Aquisição e datasets HuggingFace
+# [PT] Aquisição e datasets HuggingFace | [EN] Acquisition and HuggingFace datasets
 datasets==4.8.4
 huggingface_hub==0.36.2
 
-# Pipeline de larga escala (Common Crawl, dedup distribuído)
+# [PT] Pipeline de larga escala (Common Crawl, dedup distribuído)
 # Extras: `processing` (filtros/langid) + `io` (warcio/faust-cchardet/python-magic)
 # — o extra `io` é obrigatório para o WarcReader do Script 07 (Common Crawl).
+# [EN] Large-scale pipeline (Common Crawl, distributed dedup)
+# Extras: `processing` (filters/langid) + `io` (warcio/faust-cchardet/python-magic)
+# — the `io` extra is required for the WarcReader of Script 07 (Common Crawl).
 datatrove[processing,io]==0.9.0
 
-# Armazenamento colunar Parquet + Zstandard
+# [PT] Armazenamento colunar Parquet + Zstandard | [EN] Columnar Parquet storage + Zstandard
 pyarrow==23.0.1
 zstandard==0.25.0
 
-# Deduplicação MinHash LSH
+# [PT] Deduplicação MinHash LSH | [EN] MinHash LSH deduplication
 datasketch==1.9.0
 xxhash==3.6.0
 
-# Identificação de idioma (compatível com NumPy 2.x)
+# [PT] Identificação de idioma (compatível com NumPy 2.x) | [EN] Language identification (compatible with NumPy 2.x)
 fasttext-numpy2-wheel==0.9.2
 
-# Tokenização (Fase 2a) e contagem de tokens
+# [PT] Tokenização (Fase 2a) e contagem de tokens | [EN] Tokenization (Phase 2a) and token counting
 tokenizers==0.22.2
 sentencepiece==0.2.0
 
-# Extração de conteúdo web (pipeline Common Crawl)
+# [PT] Extração de conteúdo web (pipeline Common Crawl) | [EN] Web content extraction (Common Crawl pipeline)
 trafilatura==1.11.0
 
-# Numérico / dados
+# [PT] Numérico / dados | [EN] Numeric / data
 numpy==2.4.4
 pandas==3.0.2
 scipy==1.17.1
 regex==2026.3.32
 
-# Observabilidade e utilidades
+# [PT] Observabilidade e utilidades | [EN] Observability and utilities
 loguru==0.7.3
 rich==14.3.3
 tqdm==4.67.3

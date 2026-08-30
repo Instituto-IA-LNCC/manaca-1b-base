@@ -2,6 +2,26 @@
 """
 LLM-BR URL Checker
 ==================
+
+PT ------------------------------------------------------------------------
+Verificador de URLs do LLM-BR
+Script automatico para verificar URLs em arquivos Markdown.
+Parte do projeto LLM-BR — LNCC × NII.
+
+Uso:
+    pip install requests
+    python scripts/check-urls.py [arquivo_ou_diretorio_markdown]
+
+Exemplos:
+    python scripts/check-urls.py reports/corpora-survey/url-audit.md
+    python scripts/check-urls.py reports/
+    python scripts/check-urls.py  # verifica todos os arquivos .md do repositorio
+
+Saida:
+    Imprime uma tabela resumo com os codigos de status de cada URL encontrada.
+    Gera check-urls-report.json com os resultados completos.
+
+EN ------------------------------------------------------------------------
 Automated script to verify URLs in Markdown files.
 Part of the LLM-BR project — LNCC × NII.
 
@@ -18,7 +38,7 @@ Output:
     Prints a summary table with status codes for each URL found.
     Generates check-urls-report.json with full results.
 
-Author: Bruno Menezes (brunolsm@lncc.br)
+Autor | Author: Bruno Menezes (brunolsm@lncc.br)
 License: CC BY 4.0
 Version: 0.1.0 — March 2026
 """
@@ -196,7 +216,9 @@ def main():
         counts[r["status"]] = counts.get(r["status"], 0) + 1
 
     print("=" * 70)
+    # Resumo final bilingue (EN + PT) — o resultado que o usuario le ao fim da execucao.
     print(f"  SUMMARY — {len(all_results)} unique URLs checked")
+    print(f"  RESUMO — {len(all_results)} URLs unicas verificadas")
     print("=" * 70)
     for status, emoji in STATUS_EMOJI.items():
         n = counts.get(status, 0)
@@ -223,6 +245,7 @@ def main():
     with open(args.output, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
     print(f"  📊 Full report saved to: {args.output}")
+    print(f"  📊 Relatorio completo salvo em: {args.output}")
     print()
 
     # Exit with error code if any broken URLs found

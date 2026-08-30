@@ -1,4 +1,11 @@
 # Corpus Manacá — Manual Técnico de Extração
+
+**[🇧🇷 Português](#português)** · **[🇬🇧 English](#english)**
+
+---
+
+## Português
+
 ## Fase 1: Construção do Corpus PT-BR
 
 **Elaborado por:** Bruno Leonardo Santos Menezes  
@@ -592,4 +599,603 @@ docker logs -f <fonte>
 ---
 
 *Versão 0.2.0 — Abril de 2026 | Projeto Manacá — LNCC × NII/LLM-jp*  
+*Instituto-IA-LNCC · `brunolsm@lncc.br`*
+
+---
+
+## English
+
+## Phase 1: Building the PT-BR Corpus
+
+**Prepared by:** Bruno Leonardo Santos Menezes  
+**Coordination:** Prof. Fábio Porto  
+**Institution:** LNCC / AI Institute  
+**Date:** April 2026 | **Version:** 0.2.0
+
+---
+
+> 🐳 **Fork `manaca-1b` — Docker execution.** This fork runs in Docker
+> containers, not on `conda` + `screen` + SLURM. Command-translation rule for
+> the instructions below: where you read `conda activate manaca-corpus && python <script>`, use
+> `docker compose run --rm corpus python <script>`; where you read
+> `screen -S <fonte> ...`, use `docker compose run -d --name <fonte> corpus ...`
+> (or the `Makefile` shortcuts: `make gigaverbo`, `make dedup`, `make validate`).
+> Full guide: [`../docs/environment/setup-guide-docker-pt.md`](../docs/environment/setup-guide-docker-pt.md).
+
+---
+
+## Contents
+
+1. [Strategy Overview](#1-strategy-overview)
+2. [Prerequisites](#2-prerequisites)
+3. [Script Structure](#3-script-structure)
+4. [Script 00 — Environment Verification](#4-script-00--environment-verification)
+5. [Script 01 — GigaVerbo](#5-script-01--gigaverbo)
+6. [Script 02 — MADLAD-400](#6-script-02--madlad-400)
+7. [Script 03 — FineWeb-2](#7-script-03--fineweb-2)
+8. [Script 04 — HPLT 2.0](#8-script-04--hplt-20)
+9. [Script 05 — Wikipedia PT-BR](#9-script-05--wikipedia-pt-br)
+10. [Script 06 — Ulysses Tesemõ](#10-script-06--ulysses-tesemõ)
+11. [Script 07 — Common Crawl](#11-script-07--common-crawl)
+12. [Script 08 — Global Deduplication](#12-script-08--global-deduplication)
+13. [Script 09 — Validation and Statistics](#13-script-09--validation-and-statistics)
+14. [Execution Flow](#14-execution-flow)
+15. [Monitoring](#15-monitoring)
+16. [References](#16-references)
+
+---
+
+## 1. Strategy Overview
+
+The construction of the Manacá corpus follows the methodology established by three
+top reference works in the field:
+
+- **FineWeb** (Penedo et al., 2024, arXiv:2406.17557) — high-quality filtering
+  pipeline for web data; the datatrove framework used as the basis of this
+  project was developed specifically to reproduce and extend this work.
+- **Dolma** (Soldaini et al., 2024, arXiv:2402.00159) — multi-source corpus
+  architecture with two-pass deduplication (within-source + cross-source).
+- **Tucano** (de Lucena et al., 2024, arXiv:2411.07854) — specific reference
+  for PT-BR; demonstrates that GigaVerbo as a base produces models superior to
+  training on non-curated multilingual corpora.
+
+### 1.1 Phase 1 Goal
+
+| Metric | Goal |
+|---------|------|
+| Total volume | >= 1 trillion tokens (1 TB tokens) |
+| Language | Brazilian Portuguese (PT-BR) |
+| License | Compatible with commercial use and open academic use |
+| Output format | Apache Parquet + Zstandard compression |
+| Traceability | Per-source JSON manifest with SHA-256 checksums |
+
+### 1.2 Source Prioritization
+
+| Tier | Criterion | Sources | Est. volume |
+|------|----------|--------|-------------|
+| 1 | No authentication · open license | GigaVerbo, MADLAD-400, FineWeb-2, HPLT 2.0, Wikipedia PT-BR, Ulysses Tesemõ | ~410-440 B tokens |
+| 2 | Requires HuggingFace approval | CulturaX, Jabuticaba | ~340 B tokens |
+| 3 | Built in-house via datatrove | Common Crawl snapshots 2024-2025 | unlimited |
+
+### 1.3 Quality Pipeline (all sources)
+
+```
+Fonte bruta
+    |
+    v
+[LangID]        GlotLID / fastText — manter somente PT
+    |           Threshold: score >= 0.65
+    v
+[Heurísticas]   Filtros Gopher (Rae et al. 2021, arXiv:2112.11446):
+    |           min/max palavras · razão alfabética >= 0.50
+    |           razão de símbolos <= 0.10 · stop words PT-BR
+    v
+[Dedup local]   MinHash LSH within-source
+    |           Lee et al. (2022, arXiv:2107.06499)
+    |           128 permutações · Jaccard threshold >= 0.80
+    v
+[Parquet/Zstd]  Shards de 50.000 documentos
+                Schema: text · source · id · lang · score
+    |
+    v
+[Dedup global]  MinHash LSH cross-source (Script 08)
+    |
+    v
+Corpus final >= 1 TB tokens
+```
+
+### 1.4 Infrastructure
+
+| Component | Specification |
+|------------|--------------|
+| Runtime | Docker (image `manaca-corpus`, `docker/Dockerfile.corpus`) |
+| CPU | ≥ 8 threads recommended (I/O-bound) |
+| RAM | ≥ 32 GiB recommended |
+| Corpus storage | `WORK_DIR` volume — bind mount `./data` (or NFS via `DATA_DIR`) |
+| Python | 3.11 · Docker image (dependencies pinned in `requirements/corpus.txt`) |
+| Main framework | datatrove 0.9.0 (Penedo et al., 2024) |
+
+---
+
+## 2. Prerequisites
+
+### 2.1 Environment (Docker image)
+
+```bash
+cp .env.example .env       # ajuste DATA_DIR, HF_TOKEN, ...
+make build-corpus          # constrói a imagem manaca-corpus
+# Um shell no container, se quiser inspecionar:
+docker compose run --rm corpus /bin/sh
+```
+
+### 2.2 Working volume (bind mount)
+
+The corpus is written to the `WORK_DIR` volume (`/workspace/manaca-corpus` in the
+container), mounted from `DATA_DIR` on the host (default `./data`). Make sure
+the directory exists and is writable — the container creates it automatically on
+startup. To point to an NFS: `DATA_DIR=/caminho/do/nfs/manaca-corpus`.
+
+### 2.3 Full verification (mandatory before any script)
+
+```bash
+make verify
+# equivale a: docker compose run --rm corpus python corpus/scripts/00_verify_env.py
+# Todos os itens críticos devem mostrar OK
+```
+
+---
+
+## 3. Script Structure
+
+```
+corpus/
+├── README.md                        <- Este manual técnico
+├── configs/
+│   └── manaca_corpus.yaml           <- Configuração centralizada
+└── scripts/
+    ├── 00_verify_env.py             <- Verificação do ambiente · executar primeiro
+    ├── 01_acquire_gigaverbo.py      <- Tier 1 · P1 · 200B tokens · Apache 2.0
+    ├── 02_acquire_madlad400.py      <- Tier 1 · P2 · ~80B tokens · Apache 2.0
+    ├── 03_acquire_fineweb2.py       <- Tier 1 · P3 · ~150B tokens · ODC-By
+    ├── 04_acquire_hplt2.py          <- Tier 1 · P4 · ~60B tokens · CC0
+    ├── 05_acquire_wikipedia.py      <- Tier 1 · P5 · ~1B tokens · CC BY-SA
+    ├── 06_acquire_ulysses.py        <- Tier 1 · P6 · ~10B tokens · Público
+    ├── 07_cc_pipeline.py            <- Tier 3 · Common Crawl via datatrove
+    ├── 08_global_dedup.py           <- Deduplicação cross-source MinHash LSH
+    └── 09_validate_corpus.py        <- Validação e relatório estatístico final
+```
+
+### 3.1 Conventions applied in all scripts
+
+**Idempotency:** Each script checks already-written shards before starting.
+Re-running never overwrites data — it automatically resumes from the point of failure.
+
+**Fixed Parquet schema** (identical across all scripts in the suite):
+
+```python
+pa.schema([
+    pa.field("text",   pa.string()),   # texto limpo
+    pa.field("source", pa.string()),   # identificador da fonte
+    pa.field("id",     pa.string()),   # id único do documento
+    pa.field("lang",   pa.string()),   # código de idioma (GlotLID/fastText)
+    pa.field("score",  pa.float32()),  # score de qualidade [0.0-1.0]
+])
+```
+
+**JSON manifest:** Each written shard atomically updates
+$WORK_DIR/checkpoints/acquisition_manifest.json with complete metadata,
+ensuring traceability for open publication of the artifacts.
+
+**Execution in a detached container (for long jobs):**
+
+```bash
+# Container destacado (equivale ao screen; sobrevive ao fechamento do terminal):
+docker compose run -d --name <fonte> corpus python corpus/scripts/NN_acquire_<fonte>.py
+docker logs -f <fonte>
+# ou, com os atalhos do Makefile: make gigaverbo && make logs SRC=gigaverbo
+```
+
+---
+
+## 4. Script 00 — Environment Verification
+
+**File:** `corpus/scripts/00_verify_env.py`  
+**Execution time:** ~1 minute  
+**Status:** ✅ Implemented and verified on a Linux GPU server
+
+### What it checks
+
+| Check | Success criterion |
+|-------------|---------------------|
+| Python 3.11 | sys.version_info == (3, 11, x) |
+| Critical packages | 16 packages · import without error · minimum version satisfied |
+| Parquet + Zstd | Write and read with the full 5-field schema |
+| MinHash LSH | Identical Jaccard = 1.0 · Different Jaccard < 0.10 |
+| fastText LangID | Identification of PT-BR text |
+| HuggingFace Hub | HTTP 200 · latency < 5s |
+| WORK_DIR volume | Existence and write permission (warning, not critical error) |
+| Workspace dirs | Existence of 7 subdirectories in $WORK_DIR |
+| Disk | >= 50 GB available |
+
+### Execution
+
+```bash
+make verify
+# equivale a:
+docker compose run --rm corpus python corpus/scripts/00_verify_env.py
+```
+
+---
+
+## 5. Script 01 — GigaVerbo
+
+**File:** `corpus/scripts/01_acquire_gigaverbo.py`  
+**Priority:** 1 — first source to be extracted  
+**Status:** ✅ Implemented
+
+### Scientific Rationale
+
+GigaVerbo is the largest public monolingual PT-BR corpus. De Lucena et al. (2024)
+showed that training the Tucano-1.1B model exclusively on this corpus yields
+performance superior to mC4 and CC-100 across all evaluated PT-BR benchmarks,
+proving that quality and specificity outweigh raw volume.
+
+Reference: de Lucena, R. et al. (2024). *Tucano*. arXiv:2411.07854.
+
+### Specifications
+
+| Attribute | Value |
+|----------|-------|
+| HuggingFace repo | TucanoBR/GigaVerbo |
+| Estimated tokens | 200 billion |
+| Compressed size | ~80-100 GB (Parquet + Zstd) |
+| License | Apache 2.0 |
+| Authentication | Not required |
+| Filters | Basic sanity (corpus already curated by the TucanoBR team) |
+| Estimated time (ha4) | 8-16 hours |
+
+### Execution
+
+```bash
+make verify
+
+# Container destacado (equivale ao screen):
+make gigaverbo
+make logs SRC=gigaverbo
+# equivale a:
+#   docker compose run -d --name gigaverbo corpus python corpus/scripts/01_acquire_gigaverbo.py
+#   docker logs -f gigaverbo
+```
+
+---
+
+## 6. Script 02 — MADLAD-400
+
+**File:** `corpus/scripts/02_acquire_madlad400.py`  
+**Status:** ✅ Implemented
+
+### Scientific Rationale
+
+MADLAD-400 (Kudugunta et al., 2024) covers 419 languages with a rigorous
+deduplication pipeline. The PT partition (~80B tokens) complements GigaVerbo with
+distinct domains and historical periods (2013-2023).
+
+**Distinguishing feature:** PT-BR vs PT-PT variant filter via fastText lid.176.bin
+(threshold 0.65) with a second layer of lexical markers.
+
+| Attribute | Value |
+|----------|-------|
+| HuggingFace repo | allenai/MADLAD-400 · config=pt |
+| Estimated PT-BR tokens | ~50-60 billion |
+| License | Apache 2.0 |
+| Estimated time (ha4) | 6-12 hours |
+
+---
+
+## 7. Script 03 — FineWeb-2
+
+**File:** `corpus/scripts/03_acquire_fineweb2.py`  
+**Status:** ✅ Implemented
+
+### Scientific Rationale
+
+FineWeb-2 (Penedo et al., 2024) is the highest-quality publicly available web
+corpus, the result of the Gopher + C4 + FineWeb pipeline applied to 96 CC
+snapshots (2013-2024). Including it avoids weeks of CC processing to reach the same
+quality. Script 07 complements it with 2025 snapshots not covered here.
+
+**Distinguishing feature:** SnapshotTracker tracks the 96 covered CC snapshots to avoid
+overlap with Script 07 (saved to snapshot_distribution.json).
+
+| Attribute | Value |
+|----------|-------|
+| HuggingFace repo | HuggingFaceFW/fineweb-2 · config=por_Latn |
+| Estimated PT-BR tokens | ~100-120 billion |
+| License | ODC-By 1.0 |
+| Estimated time (ha4) | 12-20 hours |
+
+---
+
+## 8. Script 04 — HPLT 2.0
+
+**File:** `corpus/scripts/04_acquire_hplt2.py`  
+**Status:** ✅ Implemented
+
+### Scientific Rationale
+
+HPLT 2.0 (de Gibert et al., 2024) has a CC0 license (public domain — the most
+permissive possible) and distinct temporal coverage (CC collections 2013-2023 with
+a filtering pipeline different from FineWeb-2), increasing the temporal diversity
+of the Manacá corpus.
+
+**Distinguishing feature:** CollectionTracker documents the distribution per HPLT
+collection (analogous to Script 03's SnapshotTracker). LangID reprocessed with fastText
+for methodological uniformity across sources.
+
+| Attribute | Value |
+|----------|-------|
+| HuggingFace repo | HPLT/HPLT2.0_cleaned · config=pt |
+| Estimated PT-BR tokens | ~35-45 billion |
+| License | CC0 (public domain) |
+| Estimated time (ha4) | 4-8 hours |
+
+---
+
+## 9. Script 05 — Wikipedia PT-BR
+
+**File:** `corpus/scripts/05_acquire_wikipedia.py`  
+**Status:** ✅ Implemented
+
+### Scientific Rationale — Dual Role
+
+**Role 1 — Training corpus:** factual encyclopedic text, human-reviewed,
+a quality anchor analogous to LLM-jp-corpus v4.
+
+**Role 2 — KenLM model bootstrap:** the extracted texts train a 5-gram language
+model (Heafield et al., 2013) used as a perplexity filter in
+Script 07 (Common Crawl). Technique introduced by CCNet (Wenzek et al., 2020).
+
+**Distinguishing feature:** no PT-BR/PT-PT variant filter (Wikipedia is predominantly
+PT-BR). Specific cleaning via clean_wikipedia_text(). Title prefixing
+(GPT-3/T5 practice). Collection of score distribution for a quality benchmark.
+
+| Attribute | Value |
+|----------|-------|
+| HuggingFace repo | wikimedia/wikipedia · config=20231101.pt |
+| Estimated tokens | ~1 billion |
+| License | CC BY-SA 4.0 |
+| Estimated time (ha4) | 1-2 hours |
+
+---
+
+## 10. Script 06 — Ulysses Tesemõ
+
+**File:** `corpus/scripts/06_acquire_ulysses.py`  
+**Status:** ✅ Implemented
+
+### Scientific Rationale
+
+Ulysses Tesemõ (Nascimento et al., 2023) is the largest legal-legislative PT-BR
+corpus: 3.5 million files, 30.7 GiB, 159 government sources (Câmara,
+Senado, STF, STJ, TCU, ministries). Brazilian government documents are
+public domain by constitutional mandate (Art. 216, CF/1988).
+
+**Unique distinguishing feature — Git pipeline:** this is the only non-HuggingFace source.
+Pipeline: git clone --depth=1 → file scan → clean_legal_text()
+→ Parquet. Alphabetic threshold 40% (vs 50% for the others) to accommodate
+legal text with case numbers, articles, and monetary values.
+
+| Attribute | Value |
+|----------|-------|
+| GitHub | ulysses-camara/ulysses-tesemo |
+| Estimated tokens | ~10 billion |
+| License | Public domain |
+| Estimated time (ha4) | 2-4h clone + 2-4h processing |
+
+---
+
+## 11. Script 07 — Common Crawl
+
+**File:** `corpus/scripts/07_cc_pipeline.py`  
+**Status:** ✅ Implemented · requires SLURM for production
+
+### Scientific Rationale
+
+Processes 2025 snapshots not covered by FineWeb-2 (cutoff: Dec/2024) using
+the full FineWeb pipeline via the datatrove framework. Access via direct HTTPS
+(data.commoncrawl.org) at no cost.
+
+**Structural distinguishing feature:** the only script based on the datatrove framework as
+orchestrator. Two execution modes via CLI:
+- `--executor local`: test without SLURM (4-8 tasks)
+- `--executor slurm`: production on the DEXL/SDumont cluster (64+ tasks)
+
+Pipeline: WARCReader → LanguageFilter (GlotLID) → GopherQualityFilter →
+GopherRepetitionFilter → C4QualityFilter → FineWebQualityFilter →
+MinhashDedupSignature → ParquetWriter
+
+| Attribute | Value |
+|----------|-------|
+| Snapshots | CC-MAIN-2024-51, CC-MAIN-2025-08, CC-MAIN-2025-18 |
+| License | Public domain |
+| Resources | SLURM recommended · 64+ tasks · 256 GB RAM/node |
+
+### Execution
+
+```bash
+# Teste local (sem SLURM, validação do pipeline):
+python corpus/scripts/07_cc_pipeline.py \
+    --snapshot CC-MAIN-2025-08 --num-tasks 4 --executor local
+
+# Produção (após SLURM disponível):
+python corpus/scripts/07_cc_pipeline.py \
+    --executor slurm --num-tasks 64 --slurm-partition cpu
+
+# Listar snapshots configurados:
+python corpus/scripts/07_cc_pipeline.py --list-snapshots
+```
+
+---
+
+## 12. Script 08 — Global Deduplication
+
+**File:** `corpus/scripts/08_global_dedup.py`  
+**Status:** ✅ Implemented · run after Scripts 01-06
+
+### Scientific Rationale
+
+Soldaini et al. (2024) showed that cross-source deduplication removes 15-30%
+of redundant content not detected by within-source deduplication, since distinct
+sources frequently capture the same web documents.
+
+**Algorithm — two passes:**
+- Pass 1: computes MinHash signatures (128 permutations) and builds the LSH index
+- Pass 2: resolves clusters keeping the doc with the highest quality_score
+
+**Source priority within clusters:** gigaverbo > wikipedia > ulysses >
+fineweb2 > madlad400 > hplt2 > common_crawl
+
+**Parameters:** 128 permutations · Jaccard threshold 0.80 · word 5-grams
+
+For volumes >50M documents: `--use-datatrove` with SlurmPipelineExecutor.
+
+### Execution
+
+```bash
+# Deduplicar todas as fontes Tier 1:
+python corpus/scripts/08_global_dedup.py
+
+# Verificar status das fontes disponíveis:
+python corpus/scripts/08_global_dedup.py --status
+
+# Para corpus >50M docs (distribuído):
+python corpus/scripts/08_global_dedup.py \
+    --use-datatrove --executor slurm --slurm-partition cpu
+```
+
+---
+
+## 13. Script 09 — Validation and Statistics
+
+**File:** `corpus/scripts/09_validate_corpus.py`  
+**Status:** ✅ Implemented · run after Script 08
+
+### What it produces
+
+| Output | Content |
+|-------|----------|
+| `stats/corpus_validation_report.json` | Complete report (JSON) |
+| `stats/corpus_summary.md` | Markdown summary for the README (The Pile/Dolma format) |
+| `stats/corpus_progress.txt` | Progress vs 1 TB goal |
+
+**Metrics computed:**
+- Precise token count via the LLM-jp-3 tokenizer (or 4 chars/token estimate)
+- Composition per source: docs, tokens, share%, license, domain
+- Quality distributions: score, alpha_ratio, TTR, stopword_ratio (p10/p50/p90)
+- Integrity: corrupted shards, schema, row count
+
+### Execution
+
+```bash
+# Validação completa com tokenizador preciso (recomendado):
+python corpus/scripts/09_validate_corpus.py \
+    --tokenizer llm-jp/llm-jp-3-tokenizer-nightly
+
+# Validação rápida (estimativa de tokens):
+python corpus/scripts/09_validate_corpus.py
+
+# Apenas integridade dos shards (rápido):
+python corpus/scripts/09_validate_corpus.py --integrity-only
+```
+
+---
+
+## 14. Execution Flow
+
+```
+PRÉ-REQUISITO: volume WORK_DIR gravável (bind mount ./data) + imagem construída
+               (make build-corpus)
+    |
+    v
+Semana 1
+  |- make verify                ~1 min    obrigatório antes de tudo
+  \- make gigaverbo             8-16h    iniciar imediatamente
+
+Semana 1-2 (após Script 01 concluído)
+  |- make madlad                6-12h
+  \- make fineweb2              12-20h
+
+Semana 2
+  |- make hplt2                 4-8h
+  |- make wikipedia             1-2h
+  \- make ulysses               2-4h (clone) + 2-4h (processamento)
+
+Semana 2-3
+  \- make cc-pipeline           48-96h   (executor local; SLURM opcional se houver cluster)
+
+Após todas as fontes
+  |- make dedup                 24-72h
+  \- make validate              1-3h
+```
+
+**Full Tier 1 estimate:** ~410-440B PT-BR tokens (~41-44% of the goal)  
+**Tier 2 pending:** CulturaX (~200B) + Jabuticaba (~139B) — HuggingFace access in progress
+
+---
+
+## 15. Monitoring
+
+```bash
+# Estado geral do manifesto de aquisição
+python -c "
+import json, os
+from pathlib import Path
+p = Path(os.environ.get('WORK_DIR', str(Path.home() / 'manaca-corpus')))
+m_path = p / 'checkpoints' / 'acquisition_manifest.json'
+if not m_path.exists():
+    print('Nenhum download iniciado ainda.')
+else:
+    m = json.loads(m_path.read_text())
+    total_b = 0
+    for src, s in m.get('sources', {}).items():
+        b = s.get('estimated_tokens_b', s.get('estimated_tokens', 0) / 1e9)
+        total_b += b
+        print(f'{src:<25} {s[\"status\"]:<14} {b:6.1f}B tokens')
+    print(f'TOTAL: {total_b:.1f}B / 1000.0B tokens ({total_b/10:.1f}%)')
+"
+
+# Espaço em disco (no host, no volume DATA_DIR)
+df -h ./data && du -sh ./data/raw/*/
+
+# Containers ativos do projeto (equivale a screen -ls / squeue)
+docker ps
+
+# Log em tempo real de qualquer fonte
+docker logs -f <fonte>
+# ou diretamente no volume: tail -f ./data/raw/<fonte>/download.log
+```
+
+---
+
+## 16. References
+
+1. Penedo, G. et al. (2024). *The FineWeb Datasets*. arXiv:2406.17557.
+2. Soldaini, L. et al. (2024). *Dolma*. arXiv:2402.00159.
+3. de Lucena, R. et al. (2024). *Tucano*. arXiv:2411.07854.
+4. Kudugunta, S. et al. (2024). *MADLAD-400*. arXiv:2309.04662.
+5. Lee, K. et al. (2022). *Deduplicating Training Data*. ACL 2022. arXiv:2107.06499.
+6. Rae, J. et al. (2021). *Scaling Language Models: Gopher*. arXiv:2112.11446.
+7. Wenzek, G. et al. (2020). *CCNet*. arXiv:2011.00180.
+8. de Gibert, O. et al. (2024). *HPLT 2.0*. arXiv:2403.05010.
+9. Joulin, A. et al. (2016). *fastText*. arXiv:1607.01759.
+10. Barbaresi, A. (2021). *Trafilatura*. ACL 2021.
+11. Nascimento, F. et al. (2023). *Ulysses*. STIL 2023.
+12. Heafield, K. et al. (2013). *Scalable Modified Kneser-Ney LM Estimation*. ACL 2013.
+13. Gao, L. et al. (2020). *The Pile*. arXiv:2101.00027.
+14. Laurençon, A. et al. (2022). *ROOTS*. arXiv:2303.03915.
+15. Kargaran, A. et al. (2023). *GlotLID*. arXiv:2303.12463.
+
+---
+
+*Version 0.2.0 — April 2026 | Manacá Project — LNCC × NII/LLM-jp*  
 *Instituto-IA-LNCC · `brunolsm@lncc.br`*

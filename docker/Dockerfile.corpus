@@ -1,13 +1,23 @@
 # syntax=docker/dockerfile:1
 # =============================================================================
-# Manacá — Imagem CPU: Fase 1 (Corpus PT-BR) + Fase 2a (Tokenizador)
+# [PT] Manacá — Imagem CPU: Fase 1 (Corpus PT-BR) + Fase 2a (Tokenizador)
+# [EN] Manacá — CPU image: Phase 1 (PT-BR Corpus) + Phase 2a (Tokenizer)
 # =============================================================================
-# Substitui um ambiente conda/Miniconda por um container Docker reprodutível
+# [PT] Substitui um ambiente conda/Miniconda por um container Docker reprodutível
 # (Python 3.11). Ver docs/environment/setup-guide-docker-pt.md.
 #
 # O CÓDIGO do repositório NÃO é copiado para dentro da imagem: ele é montado em
 # /workspace/manaca via bind mount (ver docker-compose.yml). A imagem carrega
 # apenas o AMBIENTE. Para uso sem compose:
+#   docker run --rm -it -v "$PWD":/workspace/manaca -v "$PWD/data":/workspace/manaca-corpus \
+#     manaca-corpus python corpus/scripts/00_verify_env.py
+#
+# [EN] Replaces a conda/Miniconda environment with a reproducible Docker container
+# (Python 3.11). See docs/environment/setup-guide-docker-pt.md.
+#
+# The repository CODE is NOT copied into the image: it is mounted at
+# /workspace/manaca via a bind mount (see docker-compose.yml). The image carries
+# only the ENVIRONMENT. For use without compose:
 #   docker run --rm -it -v "$PWD":/workspace/manaca -v "$PWD/data":/workspace/manaca-corpus \
 #     manaca-corpus python corpus/scripts/00_verify_env.py
 # =============================================================================

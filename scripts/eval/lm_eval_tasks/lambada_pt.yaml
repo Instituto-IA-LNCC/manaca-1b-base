@@ -1,3 +1,4 @@
+# PT ------------------------------------------------------------------------
 # LAMBADA-PT para o lm-evaluation-harness (nao e nativo do harness).
 # Usa TucanoBR/lambada-pt (traducao PT do LAMBADA da OpenAI, usada pelo Tucano).
 # O dataset tem colunas 'sentence' (contexto) e 'last_word' (alvo) -- mesmo
@@ -5,6 +6,14 @@
 # ATENCAO: o script ORIGINAL do Tucano faz geracao gulosa + match exato; este YAML
 # e uma APROXIMACAO por log-verossimilhanca (mesma faixa, pode diferir 1-2 pontos).
 # Passe este diretorio via --include_path scripts/eval/lm_eval_tasks.
+# EN ------------------------------------------------------------------------
+# LAMBADA-PT for the lm-evaluation-harness (not native to the harness).
+# Uses TucanoBR/lambada-pt (PT translation of OpenAI's LAMBADA, used by Tucano).
+# The dataset has columns 'sentence' (context) and 'last_word' (target) -- same
+# format as CALAME. Scored by log-likelihood of the last word, 0-shot.
+# ATTENTION: Tucano's ORIGINAL script uses greedy generation + exact match; this
+# YAML is an APPROXIMATION by log-likelihood (same range, may differ by 1-2 points).
+# Pass this directory via --include_path scripts/eval/lm_eval_tasks.
 task: lambada_pt
 dataset_path: TucanoBR/lambada-pt
 output_type: loglikelihood

@@ -2,12 +2,23 @@
 """
 Manacá-1B — Fase 2a · Passo 3: Conversão SentencePiece → HuggingFace
 ====================================================================
+
+PT ------------------------------------------------------------------------
 Converte o .model do SentencePiece em um tokenizador HuggingFace rápido
 (LlamaTokenizerFast), com os tokens especiais registrados (plano §6.5).
 
 Uso (container 'corpus'):
     make tokenizer-convert
     # ou: docker compose run --rm corpus python tokenizer/scripts/03_convert_to_hf.py
+
+EN ------------------------------------------------------------------------
+Manacá-1B — Phase 2a · Step 3: SentencePiece → HuggingFace conversion
+Converts the SentencePiece .model into a fast HuggingFace tokenizer
+(LlamaTokenizerFast), with the special tokens registered (plan §6.5).
+
+Usage ('corpus' container):
+    make tokenizer-convert
+    # or: docker compose run --rm corpus python tokenizer/scripts/03_convert_to_hf.py
 """
 from __future__ import annotations
 
@@ -54,8 +65,10 @@ def main() -> int:
     dec = tok.decode(ids)
     print(f"[convert] vocab={tok.vocab_size} (+{added} especiais) | round-trip: "
           f"{len(ids)} tokens")
+    # Resumo final bilingue (PT + EN) — o resultado que o usuario le ao fim.
     print(f"[convert] OK -> {args.out}")
     print("[convert] Use como --tokenizer no preprocess_data.py e nas Fases 2b/3.")
+    print("[convert] Use it as --tokenizer in preprocess_data.py and in Phases 2b/3.")
     return 0
 
 

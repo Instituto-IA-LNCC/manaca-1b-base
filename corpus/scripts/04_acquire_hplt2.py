@@ -4,6 +4,8 @@ Manacá LLM — Script 04: Aquisição do HPLT 2.0 (partição PT)
 =============================================================
 LNCC × NII/LLM-jp | Fase 1 — Corpus PT-BR
 
+================================ PT (Português) ================================
+
 Baixa a partição portuguesa do HPLT 2.0 (HPLT/HPLT2.0_cleaned),
 aplica filtro de variante linguística para reter somente PT-BR,
 e armazena em Apache Parquet + Zstandard particionado em shards
@@ -64,8 +66,72 @@ Saída:
     ├── download.log           log estruturado com timestamps
     └── langid_stats.json      estatísticas PT-BR vs PT-PT
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
-Versão: 0.1.0 — Abril 2026
+================================= EN (English) =================================
+
+Manacá LLM — Script 04: HPLT 2.0 Acquisition (PT partition)
+
+Downloads the Portuguese partition of HPLT 2.0 (HPLT/HPLT2.0_cleaned),
+applies a language-variant filter to keep only PT-BR,
+and stores it in Apache Parquet + Zstandard partitioned into shards
+of 50,000 documents.
+
+Idempotent: automatically resumes from the last saved shard.
+
+Scientific rationale:
+    de Gibert et al. (2024, arXiv:2403.05010) developed HPLT 2.0
+    (High Performance Language Technologies) as part of the eponymous
+    European consortium. Version 2.0 went through a rigorous
+    deduplication and quality-filtering pipeline, resulting in data of high
+    lexical density.
+
+    Three specific reasons to include HPLT 2.0 besides the other sources:
+
+    1. DISTINCT TEMPORAL COVERAGE: HPLT 2.0 includes Common
+       Crawl snapshots from 2013 to 2023 with a filtering methodology different from
+       FineWeb-2, capturing linguistic patterns from historical periods
+       that may be underrepresented in the other sources.
+
+    2. CC0 LICENSE (PUBLIC DOMAIN): It is the most permissive license possible,
+       with no restrictions on commercial use or redistribution. Relevant to
+       the open publication of the Manacá corpus under a maximally open license.
+
+    3. LEXICAL DIVERSITY: Internal analyses by the HPLT consortium show that
+       the HPLT 2.0 filtering pipeline preserves greater diversity of
+       text domains compared to C4, resulting in a richer vocabulary
+       for morphologically complex languages such as Portuguese.
+
+    WARNING: The PT partition includes PT-BR and PT-PT. This script applies the same
+    variant-identification pipeline as Scripts 02 and 03 (fastText +
+    lexical markers, threshold >= 0.65) for methodological consistency.
+
+MANDATORY PREREQUISITES:
+    1. Script 01 (GigaVerbo) completed and verified
+    2. Writable WORK_DIR working volume (Docker bind mount ./data, or NFS/HPC)
+    3. python corpus/scripts/00_verify_env.py returning OK
+
+Usage:
+    # Check the environment (mandatory):
+    python corpus/scripts/00_verify_env.py
+
+    # Production — always via screen:
+    # Docker (recommended): detached container, logs persisted on the volume
+    docker compose run -d --name hplt2 corpus python corpus/scripts/04_acquire_hplt2.py
+    docker compose logs -f hplt2
+    tail -f $WORK_DIR/raw/hplt2/download.log
+
+    # Quick test (foreground, interruptible with Ctrl+C):
+    python corpus/scripts/04_acquire_hplt2.py
+
+Output:
+    $WORK_DIR/raw/hplt2/
+    ├── shard_000000.parquet   (~100-200 MB · Zstd)
+    ├── shard_000001.parquet
+    ├── ...
+    ├── download.log           structured log with timestamps
+    └── langid_stats.json      PT-BR vs PT-PT statistics
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+Versão | Version: 0.1.0 — Abril 2026
 """
 
 from __future__ import annotations
@@ -728,8 +794,22 @@ def acquire() -> dict[str, Any]:
     logger.info(f"  Tempo total:        {elapsed / 3600:.1f} horas")
     logger.info(f"  Output:             {OUTPUT_DIR}")
     logger.info(f"  Manifesto:          {MANIFEST_PATH}")
+    logger.info("-" * 60)
+    logger.info(f"DONE — {SOURCE_NAME}")
+    logger.info(f"  Docs seen:          {total_seen:,}")
+    logger.info(f"  PT-BR docs kept:    {kept_ptbr:,}")
+    logger.info(f"  PT-PT docs dropped: {skip_ptpt:,}  ({skip_ptpt/max(total_seen,1):.1%})")
+    logger.info(f"  Quality dropped:    {skip_qual:,}")
+    logger.info(f"  PT-BR rate:         {final['retention_rate']:.1%}")
+    logger.info(f"  Shards:             {shard_id + 1}")
+    logger.info(f"  Total size:         {total_bytes / 1e9:.2f} GB")
+    logger.info(f"  Est. tokens:        {est_tokens / 1e9:.1f}B")
+    logger.info(f"  HPLT collections:   {len(coll_tracker.counts)}")
+    logger.info(f"  Total time:         {elapsed / 3600:.1f} hours")
+    logger.info(f"  Output:             {OUTPUT_DIR}")
+    logger.info(f"  Manifest:           {MANIFEST_PATH}")
     logger.info("=" * 60)
-    logger.info("Proximo passo: python corpus/scripts/05_acquire_wikipedia.py")
+    logger.info("Proximo passo | Next step: python corpus/scripts/05_acquire_wikipedia.py")
 
     return final
 

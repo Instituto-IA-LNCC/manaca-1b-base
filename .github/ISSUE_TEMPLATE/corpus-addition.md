@@ -1,90 +1,90 @@
 ---
-name: "📚 Add New Corpus | Adicionar Novo Corpus"
-about: "Suggest a new corpus to add to the PT-BR survey | Sugerir um novo corpus para o levantamento"
+name: "📚 Adicionar Novo Corpus | Add New Corpus"
+about: "Sugerir um novo corpus para o levantamento PT-BR | Suggest a new corpus to add to the PT-BR survey"
 title: "[CORPUS] "
 labels: ["corpus-addition", "triage"]
 assignees: []
 ---
 
-## Corpus Information | Informações do Corpus
+## Informações do Corpus / Corpus Information
 
-**Official Name / Nome Oficial:**
-<!-- e.g. brWaC (Brazilian Portuguese Web as Corpus) -->
+**Nome Oficial / Official Name:**
+<!-- ex.: brWaC (Brazilian Portuguese Web as Corpus) | e.g. brWaC (Brazilian Portuguese Web as Corpus) -->
 
-**Short Name / Sigla:**
-<!-- e.g. brWaC -->
-
----
-
-## Size / Tamanho
-
-- **Tokens / Words / Hours / Sentences:**
-- **Documents / Files:**
-- **Disk size (if known):**
+**Sigla / Short Name:**
+<!-- ex.: brWaC | e.g. brWaC -->
 
 ---
 
-## Publication / Publicação
+## Tamanho / Size
 
-- **Year / Ano:**
-- **Reference / Referência:** <!-- Full bibliographic reference with DOI if available -->
+- **Tokens / Palavras / Horas / Sentenças | Tokens / Words / Hours / Sentences:**
+- **Documentos / Arquivos | Documents / Files:**
+- **Tamanho em disco (se conhecido) | Disk size (if known):**
 
 ---
 
-## Access / Acesso
+## Publicação / Publication
 
-- **License / Licença:**
+- **Ano / Year:**
+- **Referência / Reference:** <!-- Referência bibliográfica completa com DOI, se disponível | Full bibliographic reference with DOI if available -->
+
+---
+
+## Acesso / Access
+
+- **Licença / License:**
   - [ ] CC BY 4.0
   - [ ] CC BY-SA 4.0
   - [ ] CC BY-NC 4.0
   - [ ] Apache 2.0
-  - [ ] Academic only / Acadêmica
-  - [ ] Commercial allowed / Comercial permitido
-  - [ ] Other: ___
+  - [ ] Somente acadêmica / Academic only
+  - [ ] Comercial permitido / Commercial allowed
+  - [ ] Outra / Other: ___
 
-- **Verified URL (tested, not broken) / URL Verificada:**
-  - Primary: 
-  - Mirror (if any): 
+- **URL Verificada (testada, não quebrada) | Verified URL (tested, not broken):**
+  - Primária / Primary: 
+  - Espelho (se houver) / Mirror (if any): 
 
-- **Access type / Tipo de acesso:**
-  - [ ] Direct download / Download direto
-  - [ ] Registration required / Requer cadastro
-  - [ ] Request form / Formulário de solicitação
+- **Tipo de acesso / Access type:**
+  - [ ] Download direto / Direct download
+  - [ ] Requer cadastro / Registration required
+  - [ ] Formulário de solicitação / Request form
   - [ ] API
-  - [ ] Other: ___
+  - [ ] Outro / Other: ___
 
 ---
 
-## Content / Conteúdo
+## Conteúdo / Content
 
-**Category / Categoria:**
-- [ ] General text / web
-- [ ] Scientific / academic
-- [ ] Journalistic / news
-- [ ] Speech / audio
-- [ ] Legal / government
-- [ ] Social media
-- [ ] Multilingual (includes PT-BR)
-- [ ] Other: ___
+**Categoria / Category:**
+- [ ] Texto geral / web | General text / web
+- [ ] Científico / acadêmico | Scientific / academic
+- [ ] Jornalístico / notícias | Journalistic / news
+- [ ] Fala / áudio | Speech / audio
+- [ ] Jurídico / governo | Legal / government
+- [ ] Mídia social | Social media
+- [ ] Multilíngue (inclui PT-BR) | Multilingual (includes PT-BR)
+- [ ] Outro | Other: ___
 
-**Language variety / Variedade:**
-- [ ] PT-BR only / Somente PT-BR
-- [ ] PT-BR + PT-PT (mixed)
-- [ ] Multilingual (PT-BR included)
+**Variedade / Language variety:**
+- [ ] Somente PT-BR | PT-BR only
+- [ ] PT-BR + PT-PT (misto | mixed)
+- [ ] Multilíngue (PT-BR incluído) | Multilingual (PT-BR included)
 
-**Brief description / Breve descrição:**
-<!-- 2–3 sentences describing the corpus content, collection method, and main use cases -->
+**Breve descrição / Brief description:**
+<!-- 2–3 frases descrevendo o conteúdo do corpus, o método de coleta e os principais casos de uso | 2–3 sentences describing the corpus content, collection method, and main use cases -->
 
 ---
 
 ## Checklist
 
-- [ ] URL has been manually verified and is functional
-- [ ] License has been confirmed (not assumed)
-- [ ] Bibliographic reference includes DOI or permanent URL
-- [ ] Not already listed in the survey (checked [corpora-survey-pt.md](../../reports/corpora-survey/corpora-survey-pt.md))
+- [ ] A URL foi verificada manualmente e está funcional | The URL has been manually verified and is functional
+- [ ] A licença foi confirmada (não presumida) | The license has been confirmed (not assumed)
+- [ ] A referência bibliográfica inclui DOI ou URL permanente | The bibliographic reference includes DOI or permanent URL
+- [ ] Ainda não está listado no levantamento (verificado em [corpora-survey.md](../../reports/corpora-survey/corpora-survey.md)) | Not already listed in the survey (checked [corpora-survey.md](../../reports/corpora-survey/corpora-survey.md))
 
 ---
 
-## Additional Notes / Notas Adicionais
-<!-- Any other relevant information, version history, known limitations, etc. -->
+## Notas Adicionais / Additional Notes
+<!-- Qualquer outra informação relevante, histórico de versões, limitações conhecidas, etc. | Any other relevant information, version history, known limitations, etc. -->

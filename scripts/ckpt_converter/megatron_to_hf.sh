@@ -2,6 +2,7 @@
 # =============================================================================
 # Manaca-1B - Wrapper: converter checkpoint mcore -> HuggingFace (plano §7.10)
 # -----------------------------------------------------------------------------
+# PT --------------------------------------------------------------------------
 # Roda megatron_to_hf.py dentro da imagem de treino (que tem torch+transformers),
 # LENDO a copia do checkpoint como somente-leitura (:ro) e ESCREVENDO num
 # diretorio de saida NOVO. O original e o backup nunca sao tocados.
@@ -15,6 +16,22 @@
 # Imagem: usa ${TRAIN_IMAGE:-manaca-train:latest}. Se a conversao reclamar de
 # transformers antigo (mlp_bias), atualize o transformers na imagem de treino
 # (>=4.41) e reconstrua com `make build-train`.
+#
+# EN --------------------------------------------------------------------------
+# Manaca-1B - Wrapper: convert mcore checkpoint -> HuggingFace (plan §7.10)
+# Runs megatron_to_hf.py inside the training image (which has torch+transformers),
+# READING the checkpoint copy read-only (:ro) and WRITING to a NEW output
+# directory. The original and the backup are never touched.
+#
+# Usage:
+#   ./scripts/ckpt_converter/megatron_to_hf.sh \
+#       /workspace/checkpoints/manaca-1b \
+#       /workspace/manaca-1b-hf \
+#       /path/to/manaca-tokenizer.model
+#
+# Image: uses ${TRAIN_IMAGE:-manaca-train:latest}. If the conversion complains about
+# an old transformers (mlp_bias), update transformers in the training image
+# (>=4.41) and rebuild with `make build-train`.
 # =============================================================================
 set -euo pipefail
 
@@ -51,7 +68,9 @@ docker run --rm \
       --tokenizer-model /tok/$TOK_BASE \
       --validate"
 
+# Mensagem final bilingue (PT + EN) — onde ficou o modelo e como testar.
 echo "[megatron_to_hf] pronto. Modelo HF em: $SAVE_ABS"
-echo "[megatron_to_hf] teste rapido:"
+echo "[megatron_to_hf] done. HF model at:    $SAVE_ABS"
+echo "[megatron_to_hf] teste rapido / quick test:"
 echo "    python -c \"from transformers import AutoModelForCausalLM,AutoTokenizer; \\"
 echo "      m=AutoModelForCausalLM.from_pretrained('$SAVE_ABS'); print(m.config)\""

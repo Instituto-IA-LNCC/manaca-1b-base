@@ -6,6 +6,8 @@ corpus/scripts/10_characterize_corpus.py
 Projeto Manacá LLM — LNCC × NII/LLM-jp
 Fase 1: Caracterização Estatística Completa do Corpus PT-BR
 
+================================ PT (Português) ================================
+
 Coleta as seguintes métricas por fonte e para o total, baseado na
 literatura de alto impacto (ACL/EMNLP/NeurIPS Datasets & Benchmarks):
 
@@ -78,7 +80,86 @@ REFERÊNCIAS-CHAVE
   McCarthy & Jarvis (2010). MTLD. Behavior Research Methods 42:381–392
   Covington & McFall (2010). MATTR. JQL 17:94–100
 
-Autores: Bruno L. S. Menezes, LNCC Instituto de IA
+================================= EN (English) =================================
+
+corpus/scripts/10_characterize_corpus.py
+
+Manacá LLM Project — LNCC × NII/LLM-jp
+Phase 1: Complete Statistical Characterization of the PT-BR Corpus
+
+Collects the following metrics per source and for the total, based on
+high-impact literature (ACL/EMNLP/NeurIPS Datasets & Benchmarks):
+
+BLOCK 1 — Volume and Tokenization
+  - Raw UTF-8 bytes
+  - Words (whitespace)
+  - Tokens with 3 tokenizers: GPT-2 BPE (50k), Llama-3 (128k), Gemma-2 (256k)
+  - Fertility (tokens/word) and bytes/token per tokenizer
+  - STRR — Single Token Retention Rate (Nayeem et al., arXiv:2510.09947)
+
+BLOCK 2 — Document Length Distribution
+  - Percentiles [1,5,10,25,50,75,90,95,99] of chars and Gemma-tokens
+  - Length histogram (20 bins)
+
+BLOCK 3 — Gopher Quality Signals
+  13 signals from Table A1 of Rae et al. (arXiv:2112.11446, 2021):
+  - alpha_ratio, mean_word_length, symbol_word_ratio
+  - frac_lines_end_punct, frac_no_alpha_lines
+  - dup_line_frac, dup_para_frac
+  - dup_line_char_frac, dup_para_char_frac
+  - top2_char_gram_frac, top3_char_gram_frac, top4_char_gram_frac
+  - stop_word_ratio (PT-BR stoplist)
+
+BLOCK 4 — KenLM Perplexity
+  - 5-gram Kneser–Ney model trained on Wikipedia PT-BR
+  - Mean, median, p10, p90 perplexity per document (Wenzek et al., 2019)
+
+BLOCK 5 — Lexical Diversity
+  - MATTR (Moving Average TTR, window=500, Covington & McFall 2010)
+  - MTLD (McCarthy & Jarvis 2010)
+  - Yule's K (Yule 1944)
+  - Herdan's C = log(V) / log(N)
+  Computed on a random sample of 100k docs per source
+
+BLOCK 6 — Temporal Coverage
+  - Timestamp histogram per source ('date' field when available)
+  - Distribution by year
+
+BLOCK 7 — Domain Distribution (web sources)
+  - Top 100 TLDs/domains ('url' field when available)
+  - Proportion of .br, .com.br, .gov.br, .edu.br
+
+BLOCK 8 — Inter-Source Overlap (MinHash)
+  - Pairwise Jaccard between sources via MinHash 13-grams (256 hashes)
+  - Before and after deduplication
+  (50k docs/source sample — estimates the overlap, not an exact count)
+
+BLOCK 9 — PII Detection
+  - Emails (RFC 5322 regex)
+  - CPFs (regex + digit check)
+  - Brazilian phone numbers (area code + 8/9 digits)
+  - IPv4 IPs
+
+BLOCK 10 — Benchmark Contamination (n-grams)
+  - 13-grams against declared PT-BR benchmarks
+  - ENEM, BLUEX, OAB, ASSIN2, FAQUAD, HateBR, PoEta-v2
+  (requires benchmark files in BENCHMARK_DIR)
+
+OUTPUT
+  $WORK_DIR/stats/corpus_characterization.json  — complete metrics
+  $WORK_DIR/stats/corpus_characterization.md    — readable report
+  $WORK_DIR/stats/per_source/                   — metrics per source
+
+KEY REFERENCES
+  Rae et al. (2021). Scaling Language Models (Gopher). arXiv:2112.11446
+  Wenzek et al. (2020). CCNet. LREC 2020. arXiv:1911.00359
+  Lee et al. (2022). Deduplicating Training Data. ACL 2022. arXiv:2107.06499
+  Petrov et al. (2023). Tokenizers Introduce Unfairness. NeurIPS. arXiv:2305.15425
+  Nayeem et al. (2025). Beyond Fertility (STRR). arXiv:2510.09947
+  McCarthy & Jarvis (2010). MTLD. Behavior Research Methods 42:381–392
+  Covington & McFall (2010). MATTR. JQL 17:94–100
+
+Autores | Authors: Bruno L. S. Menezes, LNCC Instituto de IA
          Co-authored-by: Fabio Porto <fporto@lncc.br>
 """
 
@@ -1277,6 +1358,16 @@ def run_characterization(skip_existing: bool = True) -> Dict:
     logger.info(f"  Total documentos:  {total_docs:,}")
     logger.info(f"  Total bytes:       {total_bytes/1e9:.2f} GB")
     logger.info(f"  Total palavras:    {total_words/1e9:.2f}B")
+    for tok_name, tv in tok_totals.items():
+        logger.info(f"  Tokens ({tok_name}):  {tv['total_tokens_est_billions']}B")
+    logger.info(f"\n  JSON:     {json_path}")
+    logger.info(f"  Markdown: {md_path}")
+    logger.info("-" * 70)
+    logger.info("CHARACTERIZATION DONE")
+    logger.info("-" * 70)
+    logger.info(f"  Total documents:   {total_docs:,}")
+    logger.info(f"  Total bytes:       {total_bytes/1e9:.2f} GB")
+    logger.info(f"  Total words:       {total_words/1e9:.2f}B")
     for tok_name, tv in tok_totals.items():
         logger.info(f"  Tokens ({tok_name}):  {tv['total_tokens_est_billions']}B")
     logger.info(f"\n  JSON:     {json_path}")

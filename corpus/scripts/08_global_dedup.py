@@ -4,6 +4,8 @@ Manacá LLM — Script 08: Deduplicação Global Cross-Source
 =========================================================
 LNCC × NII/LLM-jp | Fase 1 — Corpus PT-BR
 
+================================ PT (Português) ================================
+
 Executa deduplicação global (cross-source) sobre todos os shards
 Parquet produzidos pelos Scripts 01-07, usando MinHash LSH com
 128 permutações e threshold Jaccard 0.80.
@@ -80,8 +82,88 @@ Saída:
     ├── ...
     └── dedup_report.json      estatísticas completas
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
-Versão: 0.1.0 — Abril 2026
+================================= EN (English) =================================
+
+Manacá LLM — Script 08: Global Cross-Source Deduplication
+
+Runs global (cross-source) deduplication over all Parquet shards
+produced by Scripts 01-07, using MinHash LSH with
+128 permutations and Jaccard threshold 0.80.
+
+This is the second deduplication pass. The first pass
+(within-source) happened individually in each acquisition script.
+
+Idempotent: already-computed signatures are loaded from cache.
+
+Scientific rationale:
+    Soldaini et al. (2024, arXiv:2402.00159) showed that
+    cross-source deduplication removes 15-30% of redundant content
+    that passes within-source deduplication, since distinct sources
+    (GigaVerbo, FineWeb-2, MADLAD-400) frequently capture the
+    same web documents with small variations.
+
+    Lee et al. (2022, arXiv:2107.06499) showed that models
+    trained on deduplicated data exhibit:
+      - Lower perplexity on standard benchmarks
+      - Lower memorization rate of training sequences
+      - Better generalization on downstream tasks
+
+    Parameters adopted:
+      - 128 permutations: Jaccard standard error ≈ 0.088 (Lee et al., 2022)
+      - Threshold 0.80: conservative — preserves PT-BR lexical diversity
+      - word n-grams (n=5): robust to orthographic variations
+      - Cluster resolution: keep the document with the highest quality_score
+        ('score' field computed in each acquisition script)
+
+    References:
+      Soldaini, L. et al. (2024). Dolma. arXiv:2402.00159.
+      Lee, K. et al. (2022). Deduplicating Training Data. arXiv:2107.06499.
+      Leskovec, J. et al. (2014). Mining of Massive Datasets.
+        Cambridge University Press. (LSH fundamentals)
+
+TWO-PASS STRATEGY:
+    Pass 1 (map):    Compute MinHash signatures per document
+                     and group by LSH band → duplicate candidates
+    Pass 2 (reduce): For each candidate cluster, keep the
+                     document with the highest quality_score and mark
+                     the rest as duplicates to remove
+
+NOTE ON SCALE:
+    For the full Tier 1 corpus (~410B tokens, hundreds of millions
+    of documents), this Python implementation is adequate for volumes
+    up to ~50M documents in RAM. For larger volumes, use the
+    datatrove.pipeline.dedup module with distributed SLURM execution.
+    The build_datatrove_dedup() function offers this alternative.
+
+MANDATORY PREREQUISITES:
+    1. Scripts 01-06 (Tier 1) completed
+    2. Writable WORK_DIR working volume (Docker bind mount ./data, or NFS/HPC)
+    3. Sufficient RAM: ~1 GB per million documents (MinHash index)
+
+Usage:
+    # Deduplicate all Tier 1 sources:
+    python corpus/scripts/08_global_dedup.py
+
+    # Deduplicate only specific sources:
+    python corpus/scripts/08_global_dedup.py \\
+        --sources gigaverbo madlad400 fineweb2
+
+    # Check status without processing:
+    python corpus/scripts/08_global_dedup.py --status
+
+    # Use distributed datatrove (recommended for >50M docs):
+    python corpus/scripts/08_global_dedup.py --use-datatrove \\
+        --executor slurm --slurm-partition cpu
+
+Output:
+    $WORK_DIR/deduped/
+    ├── shard_000000.parquet   final deduplicated corpus
+    ├── shard_000001.parquet
+    ├── ...
+    └── dedup_report.json      complete statistics
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+Versão | Version: 0.1.0 — Abril 2026
 """
 
 from __future__ import annotations
@@ -552,9 +634,18 @@ class GlobalDeduplicator:
         logger.info(f"  Tempo total:        {elapsed/3600:.2f}h")
         logger.info(f"  Output:             {OUTPUT_DIR}")
         logger.info(f"  Relatorio:          {REPORT_PATH}")
+        logger.info("-" * 60)
+        logger.info("GLOBAL DEDUPLICATION DONE")
+        logger.info(f"  Docs indexed:       {indexed:,}")
+        logger.info(f"  Duplicates removed: {n_dups:,}  ({report['dedup_rate']:.1%})")
+        logger.info(f"  Docs in corpus:     {written:,}")
+        logger.info(f"  Final size:         {total_bytes/1e9:.2f} GB")
+        logger.info(f"  Total time:         {elapsed/3600:.2f}h")
+        logger.info(f"  Output:             {OUTPUT_DIR}")
+        logger.info(f"  Report:             {REPORT_PATH}")
         logger.info("=" * 60)
         logger.info(
-            "Proximo passo: python corpus/scripts/09_validate_corpus.py"
+            "Proximo passo | Next step: python corpus/scripts/09_validate_corpus.py"
         )
 
         return report

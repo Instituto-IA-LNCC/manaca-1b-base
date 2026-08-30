@@ -3,6 +3,8 @@
 """
 Manaca-1B - Junta CALAME-PT + ARC-PT + HellaSwag-PT + LAMBADA-PT numa tabela
 ============================================================================
+
+PT ------------------------------------------------------------------------
 Combina:
   * o CALAME-PT que ja temos (docs/evaluation/results-base.json), e
   * as saidas do lm-evaluation-harness para ARC-Challenge-PT, HellaSwag-PT e
@@ -17,7 +19,23 @@ Uso:
     python scripts/eval/merge_pt_benchmarks.py --lm-eval-dir <dir_das_saidas>
     # opcional: --out docs/evaluation/benchmarks-pt
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+EN ------------------------------------------------------------------------
+Manaca-1B - Merge CALAME-PT + ARC-PT + HellaSwag-PT + LAMBADA-PT into a table
+Combines:
+  * the CALAME-PT we already have (docs/evaluation/results-base.json), and
+  * the lm-evaluation-harness outputs for ARC-Challenge-PT, HellaSwag-PT and
+    LAMBADA-PT (JSONs generated with `lm_eval --output_path <dir>`),
+into a single per-model table (markdown + JSON), highlighting Manaca-1B.
+
+Robust to the exact task id: classifies by substring (arc / hellaswag /
+lambada) and picks the primary metric (acc_norm for ARC and HellaSwag, acc for
+LAMBADA), with a fallback to acc.
+
+Usage:
+    python scripts/eval/merge_pt_benchmarks.py --lm-eval-dir <output_dir>
+    # optional: --out docs/evaluation/benchmarks-pt
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
 """
 from __future__ import annotations
 
@@ -185,7 +203,9 @@ def main():
     json.dump({"linhas": {n: m for n, m in ordenado}}, open(a.out + ".json", "w", encoding="utf-8"),
               ensure_ascii=False, indent=2)
     print(md)
+    # Linha final bilingue (PT + EN) — onde a tabela consolidada foi gravada.
     print("salvo:", a.out + ".md", "e", a.out + ".json")
+    print("saved:", a.out + ".md", "and", a.out + ".json")
     faltando = [n for n, m in ordenado if any(k not in m for k in ("arc", "hellaswag", "lambada"))]
     if faltando:
         print("[nota] sem todas as tarefas ainda para:", ", ".join(faltando))

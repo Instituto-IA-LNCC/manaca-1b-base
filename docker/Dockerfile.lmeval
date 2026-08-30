@@ -1,12 +1,19 @@
 # syntax=docker/dockerfile:1
 # =============================================================================
-# Manacá — Imagem GPU ENXUTA: lm-evaluation-harness (ARC-PT/HellaSwag-PT/LAMBADA-PT)
+# [PT] Manacá — Imagem GPU ENXUTA: lm-evaluation-harness (ARC-PT/HellaSwag-PT/LAMBADA-PT)
+# [EN] Manacá — LEAN GPU image: lm-evaluation-harness (ARC-PT/HellaSwag-PT/LAMBADA-PT)
 # =============================================================================
-# So o necessario para rodar `lm_eval --model hf` (transformers), SEM vLLM.
+# [PT] So o necessario para rodar `lm_eval --model hf` (transformers), SEM vLLM.
 # Build (onde o DNS do `docker build` funciona):
 #   docker build -f docker/Dockerfile.lmeval -t manaca-lmeval:latest .
 # NO NETUNO o `docker build` quebra no DNS (nao aceita --sysctl p/ IPv6). Use:
 #   ./scripts/eval/build_lmeval_image.sh   (instala lm-eval na manaca-train e commita)
+#
+# [EN] Only what is needed to run `lm_eval --model hf` (transformers), WITHOUT vLLM.
+# Build (where the `docker build` DNS works):
+#   docker build -f docker/Dockerfile.lmeval -t manaca-lmeval:latest .
+# ON NETUNO the `docker build` breaks on DNS (does not accept --sysctl for IPv6). Use:
+#   ./scripts/eval/build_lmeval_image.sh   (installs lm-eval on manaca-train and commits)
 ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:24.12-py3
 FROM ${BASE_IMAGE}
 

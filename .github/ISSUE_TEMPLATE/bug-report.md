@@ -1,42 +1,42 @@
 ---
-name: "🐛 Bug Report / Broken URL"
-about: "Report a broken link, incorrect information, or document error"
+name: "🐛 Relato de Bug / URL Quebrada | Bug Report / Broken URL"
+about: "Relate um link quebrado, informação incorreta ou erro de documento | Report a broken link, incorrect information, or document error"
 title: "[BUG] "
 labels: ["bug", "triage"]
 assignees: []
 ---
 
-## What is broken? / O que está quebrado?
+## O que está quebrado? / What is broken?
 
-- [ ] Broken URL / Link quebrado
-- [ ] Incorrect corpus information (size, license, etc.)
-- [ ] Document formatting issue
-- [ ] Script error
-- [ ] Other: ___
-
----
-
-## Details / Detalhes
-
-**File / Arquivo:**
-<!-- e.g. reports/corpora-survey/corpora-survey-pt.md -->
-
-**Line / Linha (if applicable):**
-
-**Description / Descrição:**
-<!-- What is wrong and what the correct information should be -->
+- [ ] Link quebrado / Broken URL
+- [ ] Informação incorreta do corpus (tamanho, licença, etc.) | Incorrect corpus information (size, license, etc.)
+- [ ] Problema de formatação do documento / Document formatting issue
+- [ ] Erro de script / Script error
+- [ ] Outro / Other: ___
 
 ---
 
-## For broken URLs / Para links quebrados
+## Detalhes / Details
 
-**Original URL:**
+**Arquivo / File:**
+<!-- ex.: reports/corpora-survey/corpora-survey.md | e.g. reports/corpora-survey/corpora-survey.md -->
 
-**Error (404, SSL, redirect loop, etc.):**
+**Linha / Line (se aplicável | if applicable):**
 
-**Correct URL (if known):**
+**Descrição / Description:**
+<!-- O que está errado e qual seria a informação correta | What is wrong and what the correct information should be -->
 
 ---
 
-## Proposed fix / Correção proposta
-<!-- Optional: paste the corrected Markdown here -->
+## Para links quebrados / For broken URLs
+
+**URL original / Original URL:**
+
+**Erro (404, SSL, loop de redirecionamento, etc.) | Error (404, SSL, redirect loop, etc.):**
+
+**URL correta (se conhecida) | Correct URL (if known):**
+
+---
+
+## Correção proposta / Proposed fix
+<!-- Opcional: cole aqui o Markdown corrigido | Optional: paste the corrected Markdown here -->

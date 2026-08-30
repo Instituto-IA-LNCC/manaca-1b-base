@@ -3,6 +3,8 @@
 """
 Manaca-1B - Significancia dos benchmarks (a partir de benchmarks-pt.json)
 =========================================================================
+
+PT ------------------------------------------------------------------------
 Le a tabela consolidada (docs/evaluation/benchmarks-pt.json, com valor e SE por
 modelo/benchmark) e compara um modelo de referencia (default Manaca-1B) com os
 demais, por benchmark, usando o teste de DUAS PROPORCOES (nao pareado):
@@ -17,7 +19,23 @@ Uso:
     python scripts/eval/significance_pt.py                 # Manaca vs todos
     python scripts/eval/significance_pt.py --ref Tucano-1b1
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+EN ------------------------------------------------------------------------
+Manaca-1B - Benchmark significance (from benchmarks-pt.json)
+Reads the consolidated table (docs/evaluation/benchmarks-pt.json, with value and SE
+per model/benchmark) and compares a reference model (default Manaca-1B) against the
+others, per benchmark, using the TWO-PROPORTION test (not paired):
+
+    z = (p_ref - p_target) / sqrt(SE_ref^2 + SE_target^2),  two-tailed p-value.
+
+It is the CONSERVATIVE (marginal) test. The paired one (McNemar), as in CALAME (§9
+of the report, via paired_compare.py), requires the per-example correctness, which
+lm-eval only saves with --log_samples; when available, use paired_compare.py.
+
+Usage:
+    python scripts/eval/significance_pt.py                 # Manaca vs all
+    python scripts/eval/significance_pt.py --ref Tucano-1b1
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
 """
 from __future__ import annotations
 
@@ -48,7 +66,9 @@ def main() -> int:
         print(f"[ERRO] '{a.ref}' nao esta em {a.benchmarks}. Modelos: {list(linhas)}")
         return 1
 
-    print(f"Referencia: {a.ref}   (teste de duas proporcoes, NAO pareado)\n")
+    # Cabecalho bilingue (PT + EN) — enquadra os resultados que o usuario le.
+    print(f"Referencia: {a.ref}   (teste de duas proporcoes, NAO pareado)")
+    print(f"Reference:  {a.ref}   (two-proportion test, NOT paired)\n")
     for chave, nome in BENCHES:
         va, sa = cel(linhas[a.ref], chave)
         if va is None:

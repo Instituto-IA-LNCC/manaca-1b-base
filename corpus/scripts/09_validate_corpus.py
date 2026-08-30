@@ -4,6 +4,8 @@ Manacá LLM — Script 09: Validação e Relatório Estatístico
 ==========================================================
 LNCC × NII/LLM-jp | Fase 1 — Corpus PT-BR
 
+================================ PT (Português) ================================
+
 Valida o corpus deduplicado final e gera relatório estatístico completo
 para publicação científica e documentação do Projeto Manacá.
 
@@ -67,8 +69,75 @@ Saída:
     ├── corpus_summary.md               sumário em Markdown (para README)
     └── corpus_progress.txt             progresso vs meta 1 TB
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
-Versão: 0.1.0 — Abril 2026
+================================= EN (English) =================================
+
+Manacá LLM — Script 09: Validation and Statistical Report
+
+Validates the final deduplicated corpus and generates a complete statistical
+report for scientific publication and documentation of the Manacá Project.
+
+This is the last script of Phase 1. It must be run after Script 08
+(global deduplication) has completed successfully.
+
+Metrics produced:
+
+    VOLUME AND COMPOSITION:
+      - Precise token count per source and total
+        (via the LLM-jp-3 tokenizer as an external reference)
+      - Document length distribution (p10/p50/p90/p99)
+      - Composition per source and license
+      - Progress toward the 1 TB tokens goal
+
+    LINGUISTIC QUALITY:
+      - quality_score distribution per source
+      - Mean alphabetic ratio (cleanliness proxy)
+      - Type-Token Ratio (lexical diversity)
+      - PT-BR stop-word distribution (fluency proxy)
+      - PT-BR vs PT-PT ratio per source (multilingual sources)
+
+    TEMPORAL COVERAGE:
+      - CC snapshot distribution (FineWeb-2 and Common Crawl sources)
+      - Government-source coverage (Ulysses Tesemõ)
+
+    INTEGRITY:
+      - Verification of all Parquet shards (metadata + sample)
+      - Schema consistency across sources
+      - Detection of empty or corrupted shards
+
+References:
+    Gao, L. et al. (2020). The Pile. arXiv:2101.00027.
+      (corpus report methodology)
+    Laurençon, A. et al. (2022). ROOTS. arXiv:2303.03915.
+      (quality metrics for multilingual corpora)
+    de Lucena, R. et al. (2024). Tucano. arXiv:2411.07854.
+      (reference for PT-BR metrics)
+
+MANDATORY PREREQUISITES:
+    1. Script 08 (global deduplication) completed
+    2. $WORK_DIR/deduped/ with Parquet shards
+
+Usage:
+    # Full validation with precise token count:
+    python corpus/scripts/09_validate_corpus.py \\
+        --tokenizer llm-jp/llm-jp-3-tokenizer-nightly
+
+    # Quick validation (token estimate, no tokenizer):
+    python corpus/scripts/09_validate_corpus.py
+
+    # Only check shard integrity:
+    python corpus/scripts/09_validate_corpus.py --integrity-only
+
+    # Validate the raw corpus (before deduplication):
+    python corpus/scripts/09_validate_corpus.py --corpus-dir $WORK_DIR/raw
+
+Output:
+    $WORK_DIR/stats/
+    ├── corpus_validation_report.json   complete report (JSON)
+    ├── corpus_summary.md               Markdown summary (for the README)
+    └── corpus_progress.txt             progress vs 1 TB goal
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+Versão | Version: 0.1.0 — Abril 2026
 """
 
 from __future__ import annotations
@@ -662,20 +731,28 @@ def main() -> int:
     logger.info(f"  Documentos:  {s['total_docs']:,}")
     logger.info(f"  Tokens:      {s['total_tokens_b']:.1f}B / {s['target_tokens_b']:.0f}B ({s['progress_pct']:.1f}%)")
     logger.info(f"  Tempo:       {elapsed/3600:.2f}h")
+    logger.info("-" * 60)
+    logger.info("VALIDATION DONE")
+    logger.info(f"  Documents:   {s['total_docs']:,}")
+    logger.info(f"  Tokens:      {s['total_tokens_b']:.1f}B / {s['target_tokens_b']:.0f}B ({s['progress_pct']:.1f}%)")
+    logger.info(f"  Time:        {elapsed/3600:.2f}h")
     logger.info("")
-    logger.info("  Composição por fonte:")
+    logger.info("  Composição por fonte | Composition per source:")
     for src, info in report["sources"].items():
         logger.info(
             f"    {src:<25} {info['tokens_b']:6.2f}B  "
             f"({info['share_pct']:5.1f}%)  {info['license']}"
         )
     logger.info("")
-    logger.info(f"  Relatorios em: {output_dir}")
+    logger.info(f"  Relatorios em | Reports in: {output_dir}")
     logger.info("=" * 60)
 
     if s["progress_pct"] >= 100:
         logger.success(
             f"META DE {s['target_tokens_b']:.0f}B TOKENS ATINGIDA! Corpus completo."
+        )
+        logger.success(
+            f"{s['target_tokens_b']:.0f}B TOKENS GOAL REACHED! Corpus complete."
         )
     else:
         logger.info(
@@ -683,9 +760,18 @@ def main() -> int:
             f"— faltam {s['target_tokens_b'] - s['total_tokens_b']:.1f}B tokens."
         )
         logger.info(
+            f"Progress: {s['total_tokens_b']:.1f}B / {s['target_tokens_b']:.0f}B "
+            f"— {s['target_tokens_b'] - s['total_tokens_b']:.1f}B tokens remaining."
+        )
+        logger.info(
             "Para expandir o corpus (visão de longo prazo, modelos maiores):"
             "\n  - Solicitar acesso ao CulturaX e Jabuticaba (Tier 2)"
             "\n  - Executar Script 07 (Common Crawl) com mais snapshots"
+        )
+        logger.info(
+            "To expand the corpus (long-term vision, larger models):"
+            "\n  - Request access to CulturaX and Jabuticaba (Tier 2)"
+            "\n  - Run Script 07 (Common Crawl) with more snapshots"
         )
 
     return 0

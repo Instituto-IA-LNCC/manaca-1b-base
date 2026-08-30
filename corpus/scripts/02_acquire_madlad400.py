@@ -4,6 +4,8 @@ Manacá LLM — Script 02: Aquisição do MADLAD-400 (partição PT)
 ==============================================================
 LNCC × NII/LLM-jp | Fase 1 — Corpus PT-BR
 
+================================ PT (Português) ================================
+
 Baixa a partição portuguesa do MADLAD-400 (allenai/MADLAD-400),
 aplica filtro de variante linguística para reter somente PT-BR,
 e armazena em Apache Parquet + Zstandard particionado em shards
@@ -51,8 +53,59 @@ Saída:
     ├── download.log           log estruturado com timestamps
     └── langid_stats.json      estatísticas de distribuição PT-BR vs PT-PT
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
-Versão: 0.1.0 — Abril 2026
+================================= EN (English) =================================
+
+Manacá LLM — Script 02: MADLAD-400 Acquisition (PT partition)
+
+Downloads the Portuguese partition of MADLAD-400 (allenai/MADLAD-400),
+applies a language-variant filter to keep only PT-BR,
+and stores it in Apache Parquet + Zstandard partitioned into shards
+of 50,000 documents.
+
+Idempotent: automatically resumes from the last saved shard.
+
+Scientific rationale:
+    Kudugunta et al. (2024, arXiv:2309.04662) developed MADLAD-400
+    with a rigorous deduplication and filtering pipeline across 419 languages.
+    The PT partition (~80B tokens) complements GigaVerbo with
+    underrepresented domains (digitized documents, sources from distinct
+    historical periods) and different collection periods (2013-2023),
+    increasing the temporal and domain diversity of the Manacá corpus.
+
+    WARNING: The PT partition includes both PT-BR and PT-PT mixed together.
+    This script applies variant identification via fastText (lid.176.bin)
+    to keep only documents identified as PT-BR (score >= 0.65).
+    The 0.65 threshold is conservative to maximize recall — ambiguous
+    documents are included and may be refined in future versions of the corpus.
+
+MANDATORY PREREQUISITES:
+    1. Script 01 (GigaVerbo) completed and verified
+    2. Writable WORK_DIR working volume (Docker bind mount ./data, or NFS/HPC)
+    3. python corpus/scripts/00_verify_env.py returning OK
+
+Usage:
+    # Check the environment (mandatory):
+    python corpus/scripts/00_verify_env.py
+
+    # Production — always via screen:
+    # Docker (recommended): detached container, logs persisted on the volume
+    docker compose run -d --name madlad corpus python corpus/scripts/02_acquire_madlad400.py
+    docker compose logs -f madlad
+    tail -f $WORK_DIR/raw/madlad400/download.log
+
+    # Quick test (foreground, interruptible with Ctrl+C):
+    python corpus/scripts/02_acquire_madlad400.py
+
+Output:
+    $WORK_DIR/raw/madlad400/
+    ├── shard_000000.parquet   (~100-200 MB · Zstd)
+    ├── shard_000001.parquet
+    ├── ...
+    ├── download.log           structured log with timestamps
+    └── langid_stats.json      PT-BR vs PT-PT distribution statistics
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+Versão | Version: 0.1.0 — Abril 2026
 """
 
 from __future__ import annotations
@@ -675,8 +728,21 @@ def acquire() -> dict[str, Any]:
     logger.info(f"  Tempo total:      {elapsed / 3600:.1f} horas")
     logger.info(f"  Output:           {OUTPUT_DIR}")
     logger.info(f"  Manifesto:        {MANIFEST_PATH}")
+    logger.info("-" * 60)
+    logger.info(f"DONE — {SOURCE_NAME}")
+    logger.info(f"  Docs seen:          {total_seen:,}")
+    logger.info(f"  PT-BR docs kept:    {kept_ptbr:,}")
+    logger.info(f"  PT-PT docs dropped: {skip_ptpt:,}  ({skip_ptpt/max(total_seen,1):.1%})")
+    logger.info(f"  Quality dropped:    {skip_qual:,}")
+    logger.info(f"  PT-BR rate:         {final['retention_rate']:.1%}")
+    logger.info(f"  Shards:             {shard_id + 1}")
+    logger.info(f"  Total size:         {total_bytes / 1e9:.2f} GB")
+    logger.info(f"  Est. tokens:        {est_tokens / 1e9:.1f}B")
+    logger.info(f"  Total time:         {elapsed / 3600:.1f} hours")
+    logger.info(f"  Output:             {OUTPUT_DIR}")
+    logger.info(f"  Manifest:           {MANIFEST_PATH}")
     logger.info("=" * 60)
-    logger.info("Proximo passo: python corpus/scripts/03_acquire_fineweb2.py")
+    logger.info("Proximo passo | Next step: python corpus/scripts/03_acquire_fineweb2.py")
 
     return final
 

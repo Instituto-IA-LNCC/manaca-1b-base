@@ -3,6 +3,8 @@
 """
 Manaca-1B - Conversor Megatron (mcore) -> HuggingFace LlamaForCausalLM
 =====================================================================
+
+PT ------------------------------------------------------------------------
 Converte o checkpoint mcore do Manaca-1B (Megatron-LM, fork llm-jp/nii-geniac)
 para o formato HuggingFace, com DUAS correcoes que o saver_llama3_hf.py do fork
 NAO faz e que sao essenciais para o nosso modelo:
@@ -29,7 +31,35 @@ Uso (dentro da imagem manaca-train, que tem torch + transformers):
         --tokenizer-model /tok/manaca-tokenizer.model \
         [--iter 20000] [--save-dtype bfloat16] [--validate]
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+EN ------------------------------------------------------------------------
+Manaca-1B - Megatron (mcore) -> HuggingFace LlamaForCausalLM converter
+Converts the Manaca-1B mcore checkpoint (Megatron-LM, llm-jp/nii-geniac fork) to
+the HuggingFace format, with TWO fixes that the fork's saver_llama3_hf.py does
+NOT do and that are essential for our model:
+
+  1. PRESERVES the biases. The model was trained with add_bias_linear=True, so it
+     has bias in every linear layer (qkv, proj, fc1, fc2). We measured them and they
+     are significant (|bias| of qkv > |weight|). The fork's saver only writes .weight
+     and would discard the biases. Here we write them all, with attention_bias=True
+     and mlp_bias=True in the config.
+  2. Correct TOKEN IDS. The fork's saver hardcodes bos=128000/eos=128001 (Llama-3).
+     Our SentencePiece tokenizer uses unk=0, bos=1, eos=2, pad=3 in a vocab of
+     64128. We use those.
+
+The QKV-with-GQA split logic is the SAME as the fork's saver_llama3_hf.py (per
+KV group: [q_per, head_dim, head_dim]), so the "hard" part remains validated.
+
+SAFETY: it ONLY reads the checkpoint (never writes to it) and writes the HF model
+to a NEW directory. Runs on CPU (no GPU needed).
+
+Usage (inside the manaca-train image, which has torch + transformers):
+    python megatron_to_hf.py \
+        --load-dir /ckpt/manaca-1b \
+        --save-dir /out/manaca-1b-hf \
+        --tokenizer-model /tok/manaca-tokenizer.model \
+        [--iter 20000] [--save-dtype bfloat16] [--validate]
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
 """
 from __future__ import annotations
 
@@ -189,8 +219,11 @@ def main() -> int:
     )
     tok.save_pretrained(args.save_dir)
     print("[conv] tokenizador salvo.")
+    # Notas finais bilingues (PT + EN) — o desfecho que o usuario le.
     print("[conv] NOTA: vocab do modelo (64128) > vocab do tokenizador (~64004); as linhas")
     print("[conv]       extras de embedding sao padding, nunca emitidas. Isso e normal.")
+    print("[conv] NOTE: model vocab (64128) > tokenizer vocab (~64004); the extra")
+    print("[conv]       embedding rows are padding, never emitted. This is normal.")
     print("[conv] OK.")
 
     if args.validate:

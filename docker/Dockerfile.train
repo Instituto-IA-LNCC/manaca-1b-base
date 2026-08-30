@@ -1,8 +1,9 @@
 # syntax=docker/dockerfile:1
 # =============================================================================
-# Manacá — Imagem GPU: Fase 2b (Pré-Treinamento distribuído com Megatron-LM)
+# [PT] Manacá — Imagem GPU: Fase 2b (Pré-Treinamento distribuído com Megatron-LM)
+# [EN] Manacá — GPU image: Phase 2b (distributed Pre-Training with Megatron-LM)
 # =============================================================================
-# Substitui o fluxo HPC "module load cuda + Singularity (.sif) + srun" por uma
+# [PT] Substitui o fluxo HPC "module load cuda + Singularity (.sif) + srun" por uma
 # imagem Docker. A base é o container NGC PyTorch (CUDA, cuDNN, NCCL, PyTorch,
 # Apex, Transformer-Engine e FlashAttention já compilados) — o mesmo runtime que
 # em HPC seria empacotado como .sif via `singularity build ... docker://...`.
@@ -10,6 +11,15 @@
 # Base parametrizável: se nvcr.io estiver bloqueado pela política de rede, use
 #   --build-arg BASE_IMAGE=pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel
 # (nesse caso instale flash-attn/apex conforme necessário — ver docs).
+#
+# [EN] Replaces the HPC flow "module load cuda + Singularity (.sif) + srun" with a
+# Docker image. The base is the NGC PyTorch container (CUDA, cuDNN, NCCL, PyTorch,
+# Apex, Transformer-Engine and FlashAttention already compiled) — the same runtime
+# that on HPC would be packaged as .sif via `singularity build ... docker://...`.
+#
+# Parametrizable base: if nvcr.io is blocked by the network policy, use
+#   --build-arg BASE_IMAGE=pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel
+# (in that case install flash-attn/apex as needed — see docs).
 ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:24.12-py3
 FROM ${BASE_IMAGE}
 

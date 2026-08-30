@@ -4,6 +4,8 @@ Manacá LLM — Script 05: Aquisição da Wikipedia PT-BR
 =====================================================
 LNCC × NII/LLM-jp | Fase 1 — Corpus PT-BR
 
+================================ PT (Português) ================================
+
 Baixa a Wikipedia em Português do Brasil (wikimedia/wikipedia, config 20231101.pt),
 processa e armazena em Apache Parquet + Zstandard particionado em shards
 de 50.000 documentos.
@@ -68,8 +70,76 @@ Saída:
     $WORK_DIR/kenlm/
     └── wikipedia_ptbr_5gram.arpa   modelo KenLM (se kenlm instalado)
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
-Versão: 0.1.0 — Abril 2026
+================================= EN (English) =================================
+
+Manacá LLM — Script 05: Wikipedia PT-BR Acquisition
+
+Downloads Brazilian Portuguese Wikipedia (wikimedia/wikipedia, config 20231101.pt),
+processes and stores it in Apache Parquet + Zstandard partitioned into shards
+of 50,000 documents.
+
+Idempotent: automatically resumes from the last saved shard.
+
+Scientific rationale — DUAL ROLE of this source:
+
+    ROLE 1 — TRAINING CORPUS:
+    Wikipedia PT-BR is factual encyclopedic text, well structured and
+    human-reviewed — a rare quality in web data. LLM-jp includes
+    Japanese Wikipedia in all of its models as a quality anchor,
+    and the same principle applies to Manacá. Despite the small volume
+    (~1B tokens), the impact on model quality is disproportionate to
+    the size: models trained on Wikipedia tend to perform better
+    on factual-knowledge and reasoning tasks (Gao et al., 2020).
+
+    ROLE 2 — KENLM MODEL BOOTSTRAP:
+    Wikipedia PT-BR is used to train the KenLM language model
+    (5-gram) that serves as a perplexity filter in Scripts 02-07.
+    Documents with very high perplexity relative to the Wikipedia model
+    are indicators of spam, code, or non-Portuguese text. This technique
+    was introduced by Wenzek et al. (2020) in CCNet and is adopted by
+    FineWeb-2 and by LLM-jp-corpus v4.
+
+    We do NOT apply language-variant filters (PT-BR vs PT-PT):
+    Portuguese Wikipedia is predominantly PT-BR, and the articles
+    are identifiable by Brazilian spelling. Applying the fastText filter
+    would introduce unnecessary false negatives on data that is already high
+    quality.
+
+References:
+    Gao, L. et al. (2020). The Pile: An 800GB Dataset of Diverse Text
+        for Language Modeling. arXiv:2101.00027.
+    Wenzek, G. et al. (2020). CCNet. arXiv:2011.00180.
+    Ikuya Yamada et al. (2020). Wikipedia2Vec. arXiv:1812.06280.
+
+MANDATORY PREREQUISITES:
+    1. Writable WORK_DIR working volume (Docker bind mount ./data, or NFS/HPC)
+    2. python corpus/scripts/00_verify_env.py returning OK
+
+Usage:
+    # Check the environment (mandatory):
+    python corpus/scripts/00_verify_env.py
+
+    # Production — via screen:
+    # Docker (recommended): detached container, logs persisted on the volume
+    docker compose run -d --name wikipedia corpus python corpus/scripts/05_acquire_wikipedia.py
+    docker compose logs -f wikipedia
+    tail -f $WORK_DIR/raw/wikipedia_ptbr/download.log
+
+    # Direct execution (fast download ~1-2h, acceptable in foreground):
+    python corpus/scripts/05_acquire_wikipedia.py
+
+Output:
+    $WORK_DIR/raw/wikipedia_ptbr/
+    ├── shard_000000.parquet   (single or few shards — small volume)
+    ├── ...
+    ├── download.log
+    └── wikipedia_stats.json   corpus quality statistics
+
+    $WORK_DIR/kenlm/
+    └── wikipedia_ptbr_5gram.arpa   KenLM model (if kenlm installed)
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+Versão | Version: 0.1.0 — Abril 2026
 """
 
 from __future__ import annotations
@@ -736,13 +806,23 @@ def acquire() -> dict[str, Any]:
     logger.info(f"  Tokens est.:       {est_tokens / 1e9:.2f}B")
     logger.info(f"  Tempo total:       {elapsed / 3600:.2f} horas")
     logger.info(f"  Output:            {OUTPUT_DIR}")
+    logger.info("-" * 60)
+    logger.info(f"DONE — {SOURCE_NAME}")
+    logger.info(f"  Articles kept:     {kept:,}")
+    logger.info(f"  Articles dropped:  {skip_qual:,}")
+    logger.info(f"  Retention rate:    {final['retention_rate']:.1%}")
+    logger.info(f"  Shards:            {shard_id + 1}")
+    logger.info(f"  Total size:        {total_bytes / 1e9:.3f} GB")
+    logger.info(f"  Est. tokens:       {est_tokens / 1e9:.2f}B")
+    logger.info(f"  Total time:        {elapsed / 3600:.2f} hours")
+    logger.info(f"  Output:            {OUTPUT_DIR}")
     logger.info("=" * 60)
 
     # ── Bootstrap do modelo KenLM ─────────────────────────────────────────────
     logger.info("Iniciando bootstrap do modelo KenLM 5-gramas...")
     build_kenlm_model(all_texts)
 
-    logger.info("Proximo passo: python corpus/scripts/06_acquire_ulysses.py")
+    logger.info("Proximo passo | Next step: python corpus/scripts/06_acquire_ulysses.py")
     return final
 
 

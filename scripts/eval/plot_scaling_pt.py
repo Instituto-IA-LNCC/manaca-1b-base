@@ -3,6 +3,8 @@
 """
 Manaca-1B - Curva de escala no CALAME-PT (acuracia vs parametros)
 =================================================================
+
+PT ------------------------------------------------------------------------
 Le os vetores de acertos por exemplo (--save-calame de eval_base.py) presentes em
 docs/evaluation/logs/ e monta a curva de acuracia CALAME-PT versus numero de
 parametros, com barras de erro de 95% (SE binomial), destacando o Manaca-1B e
@@ -14,7 +16,21 @@ Uso:
     python scripts/eval/plot_scaling_pt.py
     python scripts/eval/plot_scaling_pt.py --logs docs/evaluation/logs --out docs/evaluation
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+EN ------------------------------------------------------------------------
+Manaca-1B - Scaling curve on CALAME-PT (accuracy vs parameters)
+Reads the per-example correctness vectors (--save-calame from eval_base.py) present
+in docs/evaluation/logs/ and builds the CALAME-PT accuracy curve versus number of
+parameters, with 95% error bars (binomial SE), highlighting Manaca-1B and linking
+the PT-BR family (TeenyTinyLlama + Tucano) with a trend line.
+
+Requires no internet and no GPU: it only reads the *_calame.json already generated.
+Produces PNG and PDF.
+
+Usage:
+    python scripts/eval/plot_scaling_pt.py
+    python scripts/eval/plot_scaling_pt.py --logs docs/evaluation/logs --out docs/evaluation
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
 """
 from __future__ import annotations
 

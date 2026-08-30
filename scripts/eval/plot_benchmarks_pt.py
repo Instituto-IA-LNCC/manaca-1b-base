@@ -3,6 +3,8 @@
 """
 Manaca-1B - Painel dos 4 benchmarks PT (acuracia vs parametros)
 ===============================================================
+
+PT ------------------------------------------------------------------------
 Le docs/evaluation/benchmarks-pt.json (valor e SE por modelo/benchmark) e monta
 um painel 2x2 (CALAME-PT, ARC-Challenge-PT, HellaSwag-PT, LAMBADA-PT), cada um com
 acuracia vs numero de parametros (escala log), barras de erro de IC95% (±1,96·SE),
@@ -12,7 +14,18 @@ Nao exige internet nem GPU. Uso:
     python scripts/eval/plot_benchmarks_pt.py
     python scripts/eval/plot_benchmarks_pt.py --benchmarks docs/evaluation/benchmarks-pt.json
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+EN ------------------------------------------------------------------------
+Manaca-1B - Panel of the 4 PT benchmarks (accuracy vs parameters)
+Reads docs/evaluation/benchmarks-pt.json (value and SE per model/benchmark) and
+builds a 2x2 panel (CALAME-PT, ARC-Challenge-PT, HellaSwag-PT, LAMBADA-PT), each
+with accuracy vs number of parameters (log scale), 95% CI error bars (±1.96·SE),
+Manaca-1B highlighted and the PT-BR family linked by a trend line. Produces PNG and PDF.
+
+Requires no internet and no GPU. Usage:
+    python scripts/eval/plot_benchmarks_pt.py
+    python scripts/eval/plot_benchmarks_pt.py --benchmarks docs/evaluation/benchmarks-pt.json
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
 """
 from __future__ import annotations
 

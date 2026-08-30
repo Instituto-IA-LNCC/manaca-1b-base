@@ -1,10 +1,15 @@
 # syntax=docker/dockerfile:1
 # =============================================================================
-# Manacá — Imagem GPU: Fase 4 (manacá-eval — avaliação PT-BR)
+# [PT] Manacá — Imagem GPU: Fase 4 (manacá-eval — avaliação PT-BR)
+# [EN] Manacá — GPU image: Phase 4 (manacá-eval — PT-BR evaluation)
 # =============================================================================
-# Runtime de inferência (vLLM) + métricas para a avaliação em português.
+# [PT] Runtime de inferência (vLLM) + métricas para a avaliação em português.
 # A avaliação usada no paper (CALAME-PT, ARC/HellaSwag/LAMBADA-PT) roda por
 # scripts/eval/ e pela imagem manaca-lmeval (lm-evaluation-harness).
+#
+# [EN] Inference runtime (vLLM) + metrics for the Portuguese evaluation.
+# The evaluation used in the paper (CALAME-PT, ARC/HellaSwag/LAMBADA-PT) runs via
+# scripts/eval/ and the manaca-lmeval image (lm-evaluation-harness).
 ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:24.12-py3
 FROM ${BASE_IMAGE}
 

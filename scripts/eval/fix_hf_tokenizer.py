@@ -3,6 +3,8 @@
 """
 Manaca-1B - Corrige o tokenizador HF para reproduzir o nmt_nfkc_cf do treino
 ============================================================================
+
+PT ------------------------------------------------------------------------
 O tokenizador HF gerado a partir do .model NAO minuscula/normaliza como o treino,
 entao texto com maiusculas cai em byte-fallback e diverge da tokenizacao de treino.
 Isso pune o Manaca em qualquer avaliacao que use o tokenizador HF (lm-eval etc.).
@@ -21,7 +23,28 @@ Uso (na imagem manaca-lmeval/manaca-train, que tem transformers + tokenizers + s
 Depois, no lm-eval: MANACA_HF=/m  MANACA_TOKENIZER=/hf/manaca-tok-fixed (ver
 run_lm_eval_pt.sh, que injeta tokenizer=/mtok no model_args).
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+EN ------------------------------------------------------------------------
+Manaca-1B - Fix the HF tokenizer to reproduce the training's nmt_nfkc_cf
+The HF tokenizer generated from the .model does NOT lowercase/normalize like the
+training, so text with uppercase falls into byte-fallback and diverges from the
+training tokenization. This penalizes Manaca in any evaluation that uses the HF
+tokenizer (lm-eval etc.).
+
+This script edits `tokenizer.json` AT THE JSON LEVEL (injects a normalizer
+Sequence([NFKC, Lowercase, <existing>])), which is reliable: it does not go through
+LlamaTokenizer's save_pretrained, which re-converts from the SPM and loses the
+normalizer. It writes a SMALL tokenizer directory (only the tokenizer files, class
+PreTrainedTokenizerFast) and checks it against the training SPM.
+It does NOT touch the original model.
+
+Usage (in the manaca-lmeval/manaca-train image, which has transformers + tokenizers + spm):
+    python scripts/eval/fix_hf_tokenizer.py \
+        --src /m  --spm /tok/manaca-tokenizer.model  --out /hf/manaca-tok-fixed
+
+Then, in lm-eval: MANACA_HF=/m  MANACA_TOKENIZER=/hf/manaca-tok-fixed (see
+run_lm_eval_pt.sh, which injects tokenizer=/mtok into model_args).
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
 """
 from __future__ import annotations
 
@@ -105,12 +128,17 @@ def main() -> int:
         if not ok:
             print(f"        SPM: {a_ids}")
             print(f"        HF : {b_ids}")
+    # Resultado final bilingue (PT + EN) — o veredito que o usuario le.
     print(f"\n[verificacao] {iguais}/{len(TESTES)} textos com ids identicos.")
+    print(f"[verification] {iguais}/{len(TESTES)} texts with identical ids.")
     if iguais == len(TESTES):
         print(">>> Tokenizador corrigido reproduz o SPM do treino. Use no lm-eval com "
               f"MANACA_TOKENIZER={a.out}")
+        print(">>> Fixed tokenizer reproduces the training SPM. Use it in lm-eval with "
+              f"MANACA_TOKENIZER={a.out}")
         return 0
     print(">>> Ainda ha divergencia; me mande a saida acima que eu ajusto o normalizador.")
+    print(">>> There is still a divergence; send me the output above and I will adjust the normalizer.")
     return 1
 
 

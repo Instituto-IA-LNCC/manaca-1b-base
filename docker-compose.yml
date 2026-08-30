@@ -1,19 +1,34 @@
 # =============================================================================
-# Manacá — Orquestração Docker das fases de treinamento (substitui Singularity)
+# [PT] Manacá — Orquestração Docker das fases de treinamento (substitui Singularity)
+# [EN] Manacá — Docker orchestration of the training phases (replaces Singularity)
 # =============================================================================
-# Modelo de execução:
+# [PT] Modelo de execução:
 #   HPC/Singularity            ->  Docker (este arquivo)
 #   conda activate manaca-*    ->  imagem por fase (corpus/train/eval)
 #   NFS /caminho/do/nfs/...          ->  bind mount ./data  -> /workspace/manaca-corpus
 #   screen -S <fonte> ...      ->  docker compose run -d --name <fonte> corpus ...
 #   sbatch / srun (SLURM)      ->  docker compose run + torchrun (ver scripts/docker)
 #
-# Uso rápido:
+# [PT] Uso rápido:
 #   cp .env.example .env          # ajuste tokens/paths
 #   docker compose build corpus
 #   docker compose run --rm corpus python corpus/scripts/00_verify_env.py
 #
-# GPU: requer NVIDIA Container Toolkit instalado no host.
+# [PT] GPU: requer NVIDIA Container Toolkit instalado no host.
+# =============================================================================
+# [EN] Execution model:
+#   HPC/Singularity            ->  Docker (this file)
+#   conda activate manaca-*    ->  one image per phase (corpus/train/eval)
+#   NFS /path/to/nfs/...             ->  bind mount ./data  -> /workspace/manaca-corpus
+#   screen -S <source> ...     ->  docker compose run -d --name <source> corpus ...
+#   sbatch / srun (SLURM)      ->  docker compose run + torchrun (see scripts/docker)
+#
+# [EN] Quick start:
+#   cp .env.example .env          # set tokens/paths
+#   docker compose build corpus
+#   docker compose run --rm corpus python corpus/scripts/00_verify_env.py
+#
+# [EN] GPU: requires the NVIDIA Container Toolkit installed on the host.
 # =============================================================================
 
 x-gpu-deploy: &gpu-deploy

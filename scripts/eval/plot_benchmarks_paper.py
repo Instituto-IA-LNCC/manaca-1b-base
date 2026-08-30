@@ -3,6 +3,8 @@
 """
 Manaca-1B - Painel de benchmarks para o artigo (ingles, qualidade de publicacao)
 ================================================================================
+
+PT ------------------------------------------------------------------------
 Le docs/evaluation/benchmarks-pt.json e monta um painel 2x2 (CALAME-PT,
 ARC-Challenge-PT, HellaSwag-PT, LAMBADA-PT), acuracia vs parametros (escala log),
 com barras de IC95% (+-1.96*SE), Manaca-1B destacado, tendencia da familia PT-BR e
@@ -11,7 +13,17 @@ paleta Okabe-Ito (colorblind-safe, validada). Gera PDF (vetorial) + PNG 300 dpi.
 Uso:
     python scripts/eval/plot_benchmarks_paper.py
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+EN ------------------------------------------------------------------------
+Manaca-1B - Benchmark panel for the paper (English, publication quality)
+Reads docs/evaluation/benchmarks-pt.json and builds a 2x2 panel (CALAME-PT,
+ARC-Challenge-PT, HellaSwag-PT, LAMBADA-PT), accuracy vs parameters (log scale),
+with 95% CI bars (+-1.96*SE), Manaca-1B highlighted, the PT-BR family trend and the
+Okabe-Ito palette (colorblind-safe, validated). Produces PDF (vector) + PNG 300 dpi.
+
+Usage:
+    python scripts/eval/plot_benchmarks_paper.py
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
 """
 from __future__ import annotations
 

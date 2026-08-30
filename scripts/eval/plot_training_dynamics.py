@@ -3,6 +3,8 @@
 """
 Manaca-1B - Dinamica de pre-treino (figura de artigo, ingles)
 =============================================================
+
+PT ------------------------------------------------------------------------
 Le o log cru do Megatron (docs/training/logs/train_20260706_030015.log) e monta um
 painel 1x3 com o comportamento do treino: (a) loss de treino e de validacao, (b)
 norma do gradiente (escala log, com os transientes precoces), (c) learning rate
@@ -11,7 +13,17 @@ norma do gradiente (escala log, com os transientes precoces), (c) learning rate
 Uso:
     python scripts/eval/plot_training_dynamics.py
 
-Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+EN ------------------------------------------------------------------------
+Manaca-1B - Pre-training dynamics (paper figure, English)
+Reads the raw Megatron log (docs/training/logs/train_20260706_030015.log) and builds
+a 1x3 panel with the training behavior: (a) training and validation loss, (b)
+gradient norm (log scale, with the early transients), (c) learning rate
+(warmup + cosine). X axis in billions of tokens. Okabe-Ito palette, PDF + PNG.
+
+Usage:
+    python scripts/eval/plot_training_dynamics.py
+
+Autor | Author: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
 """
 from __future__ import annotations
 
