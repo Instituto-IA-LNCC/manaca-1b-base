@@ -26,7 +26,7 @@ treinado do zero para o **português do Brasil**. Este repositório entrega o
 **Referência de arquitetura:** LLM-jp-3.1-1.8B (NII / LLM-jp).
 
 Os pesos do Manacá-1B base serão publicados em
-[`Instituto-IA-LNCC/manaca-1b-base`](https://huggingface.co/Instituto-IA-LNCC/manaca-1b-base)
+[`menezesbruno/manaca-1b-base`](https://huggingface.co/menezesbruno/manaca-1b-base)
 (CC BY 4.0). O kit de publicação (model card bilíngue + script de upload) está em
 [`publish/huggingface/`](../publish/huggingface/README.md). Até lá, este
 repositório entrega tudo o que é necessário para reconstruí-lo e reavaliá-lo.
@@ -55,7 +55,7 @@ scratch for **Brazilian Portuguese**. This repository delivers the
 **Architecture reference:** LLM-jp-3.1-1.8B (NII / LLM-jp).
 
 The Manacá-1B base weights will be published at
-[`Instituto-IA-LNCC/manaca-1b-base`](https://huggingface.co/Instituto-IA-LNCC/manaca-1b-base)
+[`menezesbruno/manaca-1b-base`](https://huggingface.co/menezesbruno/manaca-1b-base)
 (CC BY 4.0). The publication kit (bilingual model card + upload script) is in
 [`publish/huggingface/`](../publish/huggingface/README.md). Until then, this
 repository delivers everything needed to rebuild and re-evaluate it.

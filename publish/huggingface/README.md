@@ -3,7 +3,7 @@
 **[🇧🇷 Português](#português)** · **[🇬🇧 English](#english)**
 
 Kit para publicar o **Manacá-1B (base)** em
-[`Instituto-IA-LNCC/manaca-1b-base`](https://huggingface.co/Instituto-IA-LNCC/manaca-1b-base),
+[`menezesbruno/manaca-1b-base`](https://huggingface.co/menezesbruno/manaca-1b-base),
 sob **CC BY 4.0**, como ciência aberta. Conteúdo:
 
 - [`MODEL_CARD.md`](MODEL_CARD.md) — o *model card* bilíngue (vira o `README.md` do repo no HF).
@@ -25,8 +25,7 @@ Você precisa, na máquina que tem o checkpoint de treino:
    (com o normalizador `Sequence([NFKC, Lowercase])`). **Isto é obrigatório**: sem
    ele o tokenizador rápido (fast) tokeniza maiúsculas por *byte-fallback* e degrada
    os resultados de forma invisível.
-3. Uma conta no **Hugging Face** com permissão de escrita na organização
-   `Instituto-IA-LNCC` e um **token de escrita**.
+3. A sua conta no **Hugging Face** (`menezesbruno`) e um **token de escrita**.
 
 ### Passo a passo
 
@@ -54,8 +53,8 @@ Confirme que qualquer pessoa consegue carregar o modelo:
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
-tok = AutoTokenizer.from_pretrained("Instituto-IA-LNCC/manaca-1b-base")
-model = AutoModelForCausalLM.from_pretrained("Instituto-IA-LNCC/manaca-1b-base")
+tok = AutoTokenizer.from_pretrained("menezesbruno/manaca-1b-base")
+model = AutoModelForCausalLM.from_pretrained("menezesbruno/manaca-1b-base")
 ```
 
 Marque o repo do HF com a licença **CC BY 4.0** (já vem no *front-matter* do card) e
@@ -77,8 +76,7 @@ On the machine that holds the training checkpoint you need:
    (with the `Sequence([NFKC, Lowercase])` normalizer). **This is mandatory**: without
    it the fast tokenizer routes capitalized text to byte-fallback and silently
    degrades results.
-3. A **Hugging Face** account with write access to the `Instituto-IA-LNCC`
-   organization and a **write token**.
+3. Your **Hugging Face** account (`menezesbruno`) and a **write token**.
 
 ### Step by step
 
@@ -106,8 +104,8 @@ Confirm anyone can load the model:
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
-tok = AutoTokenizer.from_pretrained("Instituto-IA-LNCC/manaca-1b-base")
-model = AutoModelForCausalLM.from_pretrained("Instituto-IA-LNCC/manaca-1b-base")
+tok = AutoTokenizer.from_pretrained("menezesbruno/manaca-1b-base")
+model = AutoModelForCausalLM.from_pretrained("menezesbruno/manaca-1b-base")
 ```
 
 Mark the HF repo with the **CC BY 4.0** license (already in the card front-matter) and

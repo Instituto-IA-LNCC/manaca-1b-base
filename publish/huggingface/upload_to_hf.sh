@@ -10,7 +10,7 @@
 #
 # Pré-requisitos:
 #   pip install -U "huggingface_hub[cli]"
-#   huggingface-cli login          # token de ESCRITA da org Instituto-IA-LNCC
+#   huggingface-cli login          # token de ESCRITA da conta menezesbruno
 #
 # Uso:
 #   MODEL_DIR=/caminho/para/manaca-1b-hf \
@@ -26,7 +26,7 @@
 #
 # Prerequisites:
 #   pip install -U "huggingface_hub[cli]"
-#   huggingface-cli login          # WRITE token for the Instituto-IA-LNCC org
+#   huggingface-cli login          # WRITE token for the menezesbruno account
 #
 # Usage:
 #   MODEL_DIR=/path/to/manaca-1b-hf \
@@ -36,7 +36,7 @@
 set -euo pipefail
 
 # ── Configuração | Configuration ─────────────────────────────────────────────
-HF_REPO="${HF_REPO:-Instituto-IA-LNCC/manaca-1b-base}"
+HF_REPO="${HF_REPO:-menezesbruno/manaca-1b-base}"
 MODEL_DIR="${MODEL_DIR:-/workspace/manaca-1b-hf}"          # saída do megatron_to_hf.py
 TOKENIZER_DIR="${TOKENIZER_DIR:-}"                         # saída do fix_hf_tokenizer.py
 SELF_DIR="$(cd "$(dirname "$0")" && pwd)"

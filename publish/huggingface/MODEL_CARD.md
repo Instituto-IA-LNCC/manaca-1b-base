@@ -110,7 +110,7 @@ pareados de McNemar e validação do harness no
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
-model_id = "Instituto-IA-LNCC/manaca-1b-base"
+model_id = "menezesbruno/manaca-1b-base"
 tok = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(
     model_id, torch_dtype=torch.bfloat16, device_map="auto")
@@ -211,7 +211,7 @@ validation are in the
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
-model_id = "Instituto-IA-LNCC/manaca-1b-base"
+model_id = "menezesbruno/manaca-1b-base"
 tok = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(
     model_id, torch_dtype=torch.bfloat16, device_map="auto")
