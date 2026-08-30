@@ -1,0 +1,17 @@
+[eval] device=cuda  modelo=nicholasKluge/TeenyTinyLlama-160m
+[eval] tokenizador=HF(32000)  janela=2048 stride=1024 lowercase=False
+[eval] CALAME: baixando calamept_all.jsonl do HF (sem pip)...
+[eval] CALAME-PT: 2075 exemplos
+[eval] ---- modelagem de linguagem (texto reservado) ----
+[eval]   BPB (bits/byte)   : 0.9465   (menor e melhor)
+[eval]   perplexidade/token: 27.868
+[eval]   bits/token        : 4.8006
+[eval]   bytes/token       : 5.0721   (680 tokens, 3449 bytes)
+[eval] ---- BPB sobre CALAME (com IC) ----
+[eval]   BPB              : 0.8383   IC95% [0.8329, 0.8438]   (2075 frases)
+/usr/local/lib/python3.12/dist-packages/transformers/generation/configuration_utils.py:590: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.1` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+[eval] ---- CALAME-PT (com IC) ----
+[eval]   acuracia: 982/2075 = 47.33%   SE 1.10%   IC95% [45.01%, 49.59%]
+[eval]   acertos por exemplo salvos em: /hf/ttl-160m_calame.json
+[eval] RESUMO: {'model': 'nicholasKluge/TeenyTinyLlama-160m', 'tokenizer': 'HF(32000)', 'tokens': 680, 'bytes': 3449, 'bytes_per_token': 5.0721, 'bits_per_token': 4.8006, 'ppl_token': 27.8682, 'bpb': 0.9465, 'bpb_calame': 0.8383, 'bpb_calame_ci95': [0.8328679411753691, 0.8438323019076709], 'bpb_calame_nseg': 2075, 'calame_acc': 0.4733, 'calame_se': 0.011, 'calame_ci95': [0.45012048192771087, 0.4959036144578313], 'calame_n': 2075}

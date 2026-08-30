@@ -1,0 +1,30 @@
+# syntax=docker/dockerfile:1
+# =============================================================================
+# Manacá — Imagem GPU: Fase 4 (manacá-eval — avaliação PT-BR)
+# =============================================================================
+# Runtime de inferência (vLLM) + métricas para a avaliação em português.
+# A avaliação usada no paper (CALAME-PT, ARC/HellaSwag/LAMBADA-PT) roda por
+# scripts/eval/ e pela imagem manaca-lmeval (lm-evaluation-harness).
+ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:24.12-py3
+FROM ${BASE_IMAGE}
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    WORK_DIR=/workspace/manaca-corpus \
+    HF_HOME=/workspace/hf-cache
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements/eval.txt /tmp/requirements/eval.txt
+RUN python -m pip install -r /tmp/requirements/eval.txt
+
+WORKDIR /workspace/manaca
+
+COPY docker/entrypoint.sh /usr/local/bin/manaca-entrypoint
+RUN chmod +x /usr/local/bin/manaca-entrypoint
+ENTRYPOINT ["/usr/local/bin/manaca-entrypoint"]
+
+CMD ["python", "-c", "import vllm, transformers; print('vLLM', vllm.__version__, '| transformers', transformers.__version__)"]

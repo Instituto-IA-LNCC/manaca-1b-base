@@ -1,0 +1,124 @@
+# =============================================================================
+# Manacá — Orquestração Docker das fases de treinamento (substitui Singularity)
+# =============================================================================
+# Modelo de execução:
+#   HPC/Singularity            ->  Docker (este arquivo)
+#   conda activate manaca-*    ->  imagem por fase (corpus/train/eval)
+#   NFS /caminho/do/nfs/...          ->  bind mount ./data  -> /workspace/manaca-corpus
+#   screen -S <fonte> ...      ->  docker compose run -d --name <fonte> corpus ...
+#   sbatch / srun (SLURM)      ->  docker compose run + torchrun (ver scripts/docker)
+#
+# Uso rápido:
+#   cp .env.example .env          # ajuste tokens/paths
+#   docker compose build corpus
+#   docker compose run --rm corpus python corpus/scripts/00_verify_env.py
+#
+# GPU: requer NVIDIA Container Toolkit instalado no host.
+# =============================================================================
+
+x-gpu-deploy: &gpu-deploy
+  resources:
+    reservations:
+      devices:
+        - driver: nvidia
+          count: all
+          capabilities: [gpu]
+
+x-common-env: &common-env
+  WORK_DIR: /workspace/manaca-corpus
+  HF_HOME: /workspace/hf-cache
+  HF_DATASETS_CACHE: /workspace/hf-cache/datasets
+  TOKENIZERS_PARALLELISM: "false"
+  HF_DATASETS_IN_MEMORY_MAX_SIZE: "0"
+
+services:
+
+  # ── Fase 1 (Corpus) + Fase 2a (Tokenizador) — CPU ────────────────────────
+  corpus:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.corpus
+    image: manaca-corpus:latest
+    env_file:
+      - path: .env
+        required: false
+    environment: *common-env
+    volumes:
+      - .:/workspace/manaca
+      - ${DATA_DIR:-./data}:/workspace/manaca-corpus
+      - ${HF_CACHE_DIR:-./hf-cache}:/workspace/hf-cache
+    working_dir: /workspace/manaca
+    # Descomente para que os arquivos gerados pertençam ao seu usuário (Linux):
+    # user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+
+  # Mesma imagem da 'corpus'; serviço nomeado para a Fase 2a (tokenizador).
+  tokenizer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.corpus
+    image: manaca-corpus:latest
+    env_file:
+      - path: .env
+        required: false
+    environment: *common-env
+    volumes:
+      - .:/workspace/manaca
+      - ${DATA_DIR:-./data}:/workspace/manaca-corpus
+      - ${HF_CACHE_DIR:-./hf-cache}:/workspace/hf-cache
+    working_dir: /workspace/manaca
+
+  # ── Fase 2b — Pré-treinamento distribuído (Megatron-LM) — GPU ────────────
+  train:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.train
+      args:
+        BASE_IMAGE: ${GPU_BASE_IMAGE:-nvcr.io/nvidia/pytorch:24.12-py3}
+        MEGATRON_REPO: ${MEGATRON_REPO:-https://github.com/llm-jp/Megatron-LM.git}
+        MEGATRON_REF: ${MEGATRON_REF:-nii-geniac}
+    image: manaca-train:latest
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      <<: *common-env
+      CKPT_DIR: /workspace/checkpoints
+    volumes:
+      - .:/workspace/manaca
+      - ${DATA_DIR:-./data}:/workspace/manaca-corpus
+      - ${HF_CACHE_DIR:-./hf-cache}:/workspace/hf-cache
+      - ${CKPT_DIR:-./checkpoints}:/workspace/checkpoints
+    working_dir: /workspace/manaca
+    shm_size: "16gb"
+    ipc: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    deploy: *gpu-deploy
+
+  # ── Fase 4 — manacá-eval (vLLM + métricas) — GPU ─────────────────────────
+  eval:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.eval
+      args:
+        BASE_IMAGE: ${GPU_BASE_IMAGE:-nvcr.io/nvidia/pytorch:24.12-py3}
+    image: manaca-eval:latest
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      <<: *common-env
+      CKPT_DIR: /workspace/checkpoints
+    volumes:
+      - .:/workspace/manaca
+      - ${DATA_DIR:-./data}:/workspace/manaca-corpus
+      - ${HF_CACHE_DIR:-./hf-cache}:/workspace/hf-cache
+      - ${CKPT_DIR:-./checkpoints}:/workspace/checkpoints
+    working_dir: /workspace/manaca
+    shm_size: "16gb"
+    ipc: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    deploy: *gpu-deploy

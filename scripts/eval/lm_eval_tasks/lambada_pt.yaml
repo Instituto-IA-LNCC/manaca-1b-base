@@ -1,0 +1,25 @@
+# LAMBADA-PT para o lm-evaluation-harness (nao e nativo do harness).
+# Usa TucanoBR/lambada-pt (traducao PT do LAMBADA da OpenAI, usada pelo Tucano).
+# O dataset tem colunas 'sentence' (contexto) e 'last_word' (alvo) -- mesmo
+# formato do CALAME. Escore por log-verossimilhanca da ultima palavra, 0-shot.
+# ATENCAO: o script ORIGINAL do Tucano faz geracao gulosa + match exato; este YAML
+# e uma APROXIMACAO por log-verossimilhanca (mesma faixa, pode diferir 1-2 pontos).
+# Passe este diretorio via --include_path scripts/eval/lm_eval_tasks.
+task: lambada_pt
+dataset_path: TucanoBR/lambada-pt
+output_type: loglikelihood
+test_split: train
+num_fewshot: 0
+doc_to_text: "{{sentence}}"
+doc_to_target: "{{' '+last_word}}"
+should_decontaminate: true
+doc_to_decontamination_query: "{{sentence}}"
+metric_list:
+  - metric: perplexity
+    aggregation: perplexity
+    higher_is_better: false
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0

@@ -1,0 +1,78 @@
+# syntax=docker/dockerfile:1
+# =============================================================================
+# Manacá — Imagem CPU: Fase 1 (Corpus PT-BR) + Fase 2a (Tokenizador)
+# =============================================================================
+# Substitui um ambiente conda/Miniconda por um container Docker reprodutível
+# (Python 3.11). Ver docs/environment/setup-guide-docker-pt.md.
+#
+# O CÓDIGO do repositório NÃO é copiado para dentro da imagem: ele é montado em
+# /workspace/manaca via bind mount (ver docker-compose.yml). A imagem carrega
+# apenas o AMBIENTE. Para uso sem compose:
+#   docker run --rm -it -v "$PWD":/workspace/manaca -v "$PWD/data":/workspace/manaca-corpus \
+#     manaca-corpus python corpus/scripts/00_verify_env.py
+# =============================================================================
+FROM python:3.11-slim
+
+# Habilita instalar KenLM (Fase 1.5 — rescoring Good/Bad KenLM, Script 10).
+# Desligado por padrão pois o Script 10 ainda será implementado.
+ARG INSTALL_KENLM=false
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    # Padrões que os scripts de corpus leem (sobrepostos pelo compose/.env)
+    WORK_DIR=/workspace/manaca-corpus \
+    HF_HOME=/workspace/hf-cache \
+    HF_DATASETS_CACHE=/workspace/hf-cache/datasets \
+    TOKENIZERS_PARALLELISM=false \
+    HF_DATASETS_IN_MEMORY_MAX_SIZE=0
+
+# Dependências de sistema: build de fasttext/datasketch/sentencepiece,
+# libgomp (runtime fasttext), git (Script 06 — clone do Ulysses Tesemõ),
+# e (opcional) boost/eigen para compilar o KenLM.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        pkg-config \
+        git \
+        curl \
+        ca-certificates \
+        libgomp1 \
+        libmagic1 \
+        zlib1g-dev \
+        libbz2-dev \
+        liblzma-dev \
+        libboost-all-dev \
+        libeigen3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Camada de dependências Python (cacheável): copia só o requirements.
+COPY requirements/corpus.txt /tmp/requirements/corpus.txt
+RUN python -m pip install --upgrade pip \
+    && python -m pip install -r /tmp/requirements/corpus.txt
+
+# KenLM (opcional) — compila a partir do fonte oficial (Heafield 2011).
+RUN if [ "$INSTALL_KENLM" = "true" ]; then \
+        python -m pip install "https://github.com/kpu/kenlm/archive/master.zip" ; \
+    fi
+
+# gdown — download de pastas/arquivos públicos do Google Drive (Ulysses Tesemõ,
+# Script 06b). Camada separada para preservar o cache da pilha principal.
+RUN python -m pip install "gdown==5.2.0"
+
+# transformers + protobuf — conversão SentencePiece -> HuggingFace na Fase 2a
+# (tokenizer/scripts/03_convert_to_hf.py). O LlamaTokenizerFast lê o .model do
+# SentencePiece via protobuf (google.protobuf.internal.builder, protobuf>=3.20).
+# Camada separada preserva o cache da pilha principal.
+RUN python -m pip install "transformers==4.46.3" "protobuf==4.25.5"
+
+WORKDIR /workspace/manaca
+
+# entrypoint prepara diretórios do WORK_DIR e o cache HF antes do comando.
+COPY docker/entrypoint.sh /usr/local/bin/manaca-entrypoint
+RUN chmod +x /usr/local/bin/manaca-entrypoint
+ENTRYPOINT ["/usr/local/bin/manaca-entrypoint"]
+
+# Sem comando: valida o ambiente (equivalente ao Script 00).
+CMD ["python", "corpus/scripts/00_verify_env.py"]

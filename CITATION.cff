@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use Manacá-1B, please cite the preprint below."
+title: "Manacá-1B: An Open, Reproducible Brazilian-Portuguese Language Model and a Tokenizer-Aware, Paired Evaluation"
+abstract: >-
+  Manacá-1B is an open decoder-only language model of about 1.72 billion
+  parameters, trained from scratch for Brazilian Portuguese with a fully
+  containerized, reproducible pipeline. This repository releases the training and
+  evaluation pipeline, the raw logs, the per-example prediction vectors, and the
+  corrected tokenizer, so that every number in the paper can be recomputed.
+type: software
+authors:
+  - family-names: "Santos Menezes"
+    given-names: "Bruno Leonardo"
+    affiliation: "Laboratório Nacional de Computação Científica (LNCC)"
+    email: "brunolsm@lncc.br"
+  - family-names: "Souza Cardoso"
+    given-names: "Carlos Leonardo"
+    affiliation: "Laboratório Nacional de Computação Científica (LNCC)"
+    email: "cardoso@lncc.br"
+  - family-names: "Machado Porto"
+    given-names: "Fabio André"
+    affiliation: "Laboratório Nacional de Computação Científica (LNCC)"
+    email: "fporto@lncc.br"
+license: CC-BY-4.0
+repository-code: "https://github.com/brunoleomenezes/manaca-1b-base"
+keywords:
+  - large language model
+  - brazilian portuguese
+  - pretraining
+  - evaluation
+  - reproducibility
+  - megatron-lm
+year: 2026

@@ -1,0 +1,377 @@
+{
+  "ref": "Manaca-1B",
+  "tarefas": {
+    "lambada_pt": {
+      "metric": "acc",
+      "acc_ref": 45.31,
+      "n": 5153,
+      "comparacoes": [
+        {
+          "vs": "GlorIA-1b3",
+          "n": 5153,
+          "dif_pontos": 10.01,
+          "ic95_pareado": [
+            8.69,
+            11.37
+          ],
+          "mcnemar_b10": 890,
+          "mcnemar_b01": 374,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "mGPT-1b3",
+          "n": 5153,
+          "dif_pontos": 7.94,
+          "ic95_pareado": [
+            6.64,
+            9.22
+          ],
+          "mcnemar_b10": 816,
+          "mcnemar_b01": 407,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "TTL-160m",
+          "n": 5153,
+          "dif_pontos": 24.1,
+          "ic95_pareado": [
+            22.72,
+            25.44
+          ],
+          "mcnemar_b10": 1402,
+          "mcnemar_b01": 160,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "TTL-460m",
+          "n": 5153,
+          "dif_pontos": 23.13,
+          "ic95_pareado": [
+            21.73,
+            24.55
+          ],
+          "mcnemar_b10": 1400,
+          "mcnemar_b01": 208,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "Tucano-160m",
+          "n": 5153,
+          "dif_pontos": 19.7,
+          "ic95_pareado": [
+            18.34,
+            21.08
+          ],
+          "mcnemar_b10": 1245,
+          "mcnemar_b01": 230,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "Tucano-630m",
+          "n": 5153,
+          "dif_pontos": 14.28,
+          "ic95_pareado": [
+            12.91,
+            15.66
+          ],
+          "mcnemar_b10": 1085,
+          "mcnemar_b01": 349,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "Tucano-1b1",
+          "n": 5153,
+          "dif_pontos": 13.82,
+          "ic95_pareado": [
+            12.4,
+            15.27
+          ],
+          "mcnemar_b10": 1074,
+          "mcnemar_b01": 362,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "Tucano-2b4",
+          "n": 5153,
+          "dif_pontos": 10.96,
+          "ic95_pareado": [
+            9.57,
+            12.42
+          ],
+          "mcnemar_b10": 993,
+          "mcnemar_b01": 428,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "Sabia-7B",
+          "n": 5153,
+          "dif_pontos": -18.36,
+          "ic95_pareado": [
+            -19.81,
+            -16.92
+          ],
+          "mcnemar_b10": 319,
+          "mcnemar_b01": 1265,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        }
+      ]
+    },
+    "hellaswag_pt": {
+      "metric": "acc_norm",
+      "acc_ref": 41.61,
+      "n": 9229,
+      "comparacoes": [
+        {
+          "vs": "GlorIA-1b3",
+          "n": 9229,
+          "dif_pontos": 15.78,
+          "ic95_pareado": [
+            14.54,
+            16.95
+          ],
+          "mcnemar_b10": 2402,
+          "mcnemar_b01": 946,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "mGPT-1b3",
+          "n": 9229,
+          "dif_pontos": 16.33,
+          "ic95_pareado": [
+            15.07,
+            17.55
+          ],
+          "mcnemar_b10": 2573,
+          "mcnemar_b01": 1066,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "TTL-160m",
+          "n": 9229,
+          "dif_pontos": 11.89,
+          "ic95_pareado": [
+            11.02,
+            12.73
+          ],
+          "mcnemar_b10": 1441,
+          "mcnemar_b01": 344,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "TTL-460m",
+          "n": 9229,
+          "dif_pontos": 7.14,
+          "ic95_pareado": [
+            6.35,
+            7.93
+          ],
+          "mcnemar_b10": 1038,
+          "mcnemar_b01": 379,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "Tucano-160m",
+          "n": 9229,
+          "dif_pontos": 8.05,
+          "ic95_pareado": [
+            7.27,
+            8.86
+          ],
+          "mcnemar_b10": 1077,
+          "mcnemar_b01": 334,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "Tucano-630m",
+          "n": 9229,
+          "dif_pontos": 1.65,
+          "ic95_pareado": [
+            0.92,
+            2.36
+          ],
+          "mcnemar_b10": 660,
+          "mcnemar_b01": 508,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "Tucano-1b1",
+          "n": 9229,
+          "dif_pontos": -2.62,
+          "ic95_pareado": [
+            -3.35,
+            -1.92
+          ],
+          "mcnemar_b10": 436,
+          "mcnemar_b01": 678,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "Tucano-2b4",
+          "n": 9229,
+          "dif_pontos": -7.02,
+          "ic95_pareado": [
+            -7.79,
+            -6.27
+          ],
+          "mcnemar_b10": 318,
+          "mcnemar_b01": 966,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "Sabia-7B",
+          "n": 9229,
+          "dif_pontos": -22.94,
+          "ic95_pareado": [
+            -23.87,
+            -21.99
+          ],
+          "mcnemar_b10": 151,
+          "mcnemar_b01": 2268,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        }
+      ]
+    },
+    "arc_pt": {
+      "metric": "acc_norm",
+      "acc_ref": 27.18,
+      "n": 1170,
+      "comparacoes": [
+        {
+          "vs": "GlorIA-1b3",
+          "n": 1170,
+          "dif_pontos": 2.56,
+          "ic95_pareado": [
+            -0.51,
+            5.73
+          ],
+          "mcnemar_b10": 189,
+          "mcnemar_b01": 159,
+          "mcnemar_p": 0.1201,
+          "significativo_5pct": false
+        },
+        {
+          "vs": "mGPT-1b3",
+          "n": 1170,
+          "dif_pontos": 2.82,
+          "ic95_pareado": [
+            -0.34,
+            5.98
+          ],
+          "mcnemar_b10": 195,
+          "mcnemar_b01": 162,
+          "mcnemar_p": 0.0903,
+          "significativo_5pct": false
+        },
+        {
+          "vs": "TTL-160m",
+          "n": 1170,
+          "dif_pontos": 1.79,
+          "ic95_pareado": [
+            -0.77,
+            4.44
+          ],
+          "mcnemar_b10": 128,
+          "mcnemar_b01": 107,
+          "mcnemar_p": 0.192,
+          "significativo_5pct": false
+        },
+        {
+          "vs": "TTL-460m",
+          "n": 1170,
+          "dif_pontos": 0.09,
+          "ic95_pareado": [
+            -2.22,
+            2.39
+          ],
+          "mcnemar_b10": 96,
+          "mcnemar_b01": 95,
+          "mcnemar_p": 1.0,
+          "significativo_5pct": false
+        },
+        {
+          "vs": "Tucano-160m",
+          "n": 1170,
+          "dif_pontos": 2.14,
+          "ic95_pareado": [
+            -0.26,
+            4.7
+          ],
+          "mcnemar_b10": 119,
+          "mcnemar_b01": 94,
+          "mcnemar_p": 0.1001,
+          "significativo_5pct": false
+        },
+        {
+          "vs": "Tucano-630m",
+          "n": 1170,
+          "dif_pontos": -0.26,
+          "ic95_pareado": [
+            -2.56,
+            2.05
+          ],
+          "mcnemar_b10": 95,
+          "mcnemar_b01": 98,
+          "mcnemar_p": 0.8855,
+          "significativo_5pct": false
+        },
+        {
+          "vs": "Tucano-1b1",
+          "n": 1170,
+          "dif_pontos": -2.39,
+          "ic95_pareado": [
+            -4.79,
+            0.0
+          ],
+          "mcnemar_b10": 88,
+          "mcnemar_b01": 116,
+          "mcnemar_p": 0.0587,
+          "significativo_5pct": false
+        },
+        {
+          "vs": "Tucano-2b4",
+          "n": 1170,
+          "dif_pontos": -3.68,
+          "ic95_pareado": [
+            -6.24,
+            -1.28
+          ],
+          "mcnemar_b10": 89,
+          "mcnemar_b01": 132,
+          "mcnemar_p": 0.0047,
+          "significativo_5pct": true
+        },
+        {
+          "vs": "Sabia-7B",
+          "n": 1170,
+          "dif_pontos": -19.49,
+          "ic95_pareado": [
+            -22.48,
+            -16.5
+          ],
+          "mcnemar_b10": 67,
+          "mcnemar_b01": 295,
+          "mcnemar_p": 0.0,
+          "significativo_5pct": true
+        }
+      ]
+    }
+  }
+}

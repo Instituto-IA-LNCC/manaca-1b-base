@@ -1,0 +1,56 @@
+/usr/local/lib/python3.12/dist-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.0.7) or chardet (6.0.0.post1)/charset_normalizer (3.4.0) doesn't match a supported version!
+  warnings.warn(
+2026-08-29:23:43:14,014 INFO     [__main__.py:279] Verbosity set to INFO
+2026-08-29:23:43:14,015 INFO     [__main__.py:303] Including path: /tasks
+2026-08-29:23:43:19,629 INFO     [__init__.py:459] The tag 'arc_ca' is already registered as a group, this tag will not be registered. This may affect tasks you want to call.
+2026-08-29:23:43:19,631 INFO     [__init__.py:459] The tag 'arc_ca' is already registered as a group, this tag will not be registered. This may affect tasks you want to call.
+2026-08-29:23:43:20,662 INFO     [__main__.py:376] Selected Tasks: ['lambada_pt']
+2026-08-29:23:43:20,665 INFO     [evaluator.py:164] Setting random seed to 0 | Setting numpy seed to 1234 | Setting torch manual seed to 1234 | Setting fewshot manual seed to 1234
+2026-08-29:23:43:20,666 INFO     [evaluator.py:201] Initializing hf model, with arguments: {'pretrained': 'TucanoBR/Tucano-1b1', 'dtype': 'bfloat16'}
+2026-08-29:23:43:20,742 INFO     [huggingface.py:129] Using device 'cuda'
+2026-08-29:23:43:20,941 INFO     [huggingface.py:481] Using model type 'default'
+2026-08-29:23:43:21,168 INFO     [huggingface.py:365] Model parallel was set to False, max memory was not set, and device map was set to {'': 'cuda'}
+2026-08-29:23:43:25,232 WARNING  [task.py:325] [Task: lambada_pt] has_training_docs and has_validation_docs are False, using test_docs as fewshot_docs but this is not recommended.
+2026-08-29:23:43:25,232 WARNING  [task.py:325] [Task: lambada_pt] has_training_docs and has_validation_docs are False, using test_docs as fewshot_docs but this is not recommended.
+Traceback (most recent call last):
+  File "/usr/local/bin/lm_eval", line 8, in <module>
+    sys.exit(cli_evaluate())
+             ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/lm_eval/__main__.py", line 382, in cli_evaluate
+    results = evaluator.simple_evaluate(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/lm_eval/utils.py", line 397, in _wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/lm_eval/evaluator.py", line 235, in simple_evaluate
+    task_dict = get_task_dict(tasks, task_manager)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/lm_eval/tasks/__init__.py", line 618, in get_task_dict
+    task_name_from_string_dict = task_manager.load_task_or_group(
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/lm_eval/tasks/__init__.py", line 414, in load_task_or_group
+    collections.ChainMap(*map(self._load_individual_task_or_group, task_list))
+  File "/usr/local/lib/python3.12/dist-packages/lm_eval/tasks/__init__.py", line 314, in _load_individual_task_or_group
+    return _load_task(task_config, task=name_or_config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/lm_eval/tasks/__init__.py", line 280, in _load_task
+    task_object = ConfigurableTask(config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/lm_eval/api/task.py", line 878, in __init__
+    test_text = self.doc_to_text(test_doc)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/lm_eval/api/task.py", line 1187, in doc_to_text
+    text_string = utils.apply_template(doc_to_text, doc)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/lm_eval/utils.py", line 482, in apply_template
+    return rtemplate.render(**doc)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/jinja2/environment.py", line 1304, in render
+    self.environment.handle_exception()
+  File "/usr/local/lib/python3.12/dist-packages/jinja2/environment.py", line 939, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "<template>", line 1, in top-level template code
+  File "/usr/local/lib/python3.12/dist-packages/jinja2/environment.py", line 487, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'text' is undefined

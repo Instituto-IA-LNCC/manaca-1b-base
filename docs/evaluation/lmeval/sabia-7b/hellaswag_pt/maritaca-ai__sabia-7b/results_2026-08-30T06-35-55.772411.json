@@ -1,0 +1,121 @@
+{
+  "results": {
+    "hellaswag_pt": {
+      "alias": "hellaswag_pt",
+      "acc,none": 0.4763246288872034,
+      "acc_stderr,none": 0.00519910753906061,
+      "acc_norm,none": 0.6454653808646658,
+      "acc_norm_stderr,none": 0.004979801235776712
+    }
+  },
+  "group_subtasks": {
+    "hellaswag_pt": []
+  },
+  "configs": {
+    "hellaswag_pt": {
+      "task": "hellaswag_pt",
+      "tag": [
+        "hellaswag_multilingual"
+      ],
+      "dataset_path": "alexandrainst/m_hellaswag",
+      "dataset_name": "pt",
+      "validation_split": "val",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    def _process_doc(doc):\n        ctx = doc[\"ctx_a\"] + \" \" + doc[\"ctx_b\"].capitalize()\n        out_doc = {\n            \"query\": preprocess(doc[\"activity_label\"] + \": \" + ctx),\n            \"choices\": [preprocess(ending) for ending in doc[\"endings\"]],\n            \"gold\": int(doc[\"label\"]),\n        }\n        return out_doc\n\n    return dataset.map(_process_doc)\n",
+      "doc_to_text": "query",
+      "doc_to_target": "{{label.lstrip()}}",
+      "doc_to_choice": "choices",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 10,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0
+      }
+    }
+  },
+  "versions": {
+    "hellaswag_pt": 1.0
+  },
+  "n-shot": {
+    "hellaswag_pt": 10
+  },
+  "higher_is_better": {
+    "hellaswag_pt": {
+      "acc": true,
+      "acc_norm": true
+    }
+  },
+  "n-samples": {
+    "hellaswag_pt": {
+      "original": 9229,
+      "effective": 9229
+    }
+  },
+  "config": {
+    "model": "hf",
+    "model_args": "pretrained=maritaca-ai/sabia-7b,dtype=bfloat16",
+    "model_num_parameters": 6738415616,
+    "model_dtype": "torch.bfloat16",
+    "model_revision": "main",
+    "model_sha": "a082d7feed07a2659a38cc2ddd1952396820365b",
+    "batch_size": "auto",
+    "batch_sizes": [
+      4
+    ],
+    "device": null,
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": null,
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": null,
+  "date": 1788060990.5476153,
+  "pretty_env_info": "PyTorch version: 2.6.0a0+df5bbc09d1.nv24.12\nIs debug build: False\nCUDA used to build PyTorch: 12.6\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.1 LTS (x86_64)\nGCC version: (Ubuntu 13.2.0-23ubuntu4) 13.2.0\nClang version: Could not collect\nCMake version: version 3.31.1\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Nov  6 2024, 18:32:19) [GCC 13.2.0] (64-bit runtime)\nPython platform: Linux-5.15.0-173-generic-x86_64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 12.6.85\nCUDA_MODULE_LOADING set to: LAZY\nGPU models and configuration: \nGPU 0: NVIDIA RTX A5000\nGPU 1: NVIDIA RTX A5000\n\nNvidia driver version: 575.57.08\ncuDNN version: Probably one of the following:\n/usr/lib/x86_64-linux-gnu/libcudnn.so.9.6.0\n/usr/lib/x86_64-linux-gnu/libcudnn_adv.so.9.6.0\n/usr/lib/x86_64-linux-gnu/libcudnn_cnn.so.9.6.0\n/usr/lib/x86_64-linux-gnu/libcudnn_engines_precompiled.so.9.6.0\n/usr/lib/x86_64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.6.0\n/usr/lib/x86_64-linux-gnu/libcudnn_graph.so.9.6.0\n/usr/lib/x86_64-linux-gnu/libcudnn_heuristic.so.9.6.0\n/usr/lib/x86_64-linux-gnu/libcudnn_ops.so.9.6.0\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           46 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  64\nOn-line CPU(s) list:                     0-63\nVendor ID:                               GenuineIntel\nModel name:                              Intel(R) Xeon(R) Silver 4216 CPU @ 2.10GHz\nCPU family:                              6\nModel:                                   85\nThread(s) per core:                      2\nCore(s) per socket:                      16\nSocket(s):                               2\nStepping:                                7\nCPU(s) scaling MHz:                      25%\nCPU max MHz:                             3200.0000\nCPU min MHz:                             800.0000\nBogoMIPS:                                4200.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3 invpcid_single intel_ppin ssbd mba ibrs ibpb stibp ibrs_enhanced tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb intel_pt avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear flush_l1d arch_capabilities ibpb_exit_to_user\nVirtualization:                          VT-x\nL1d cache:                               1 MiB (32 instances)\nL1i cache:                               1 MiB (32 instances)\nL2 cache:                                32 MiB (32 instances)\nL3 cache:                                44 MiB (2 instances)\nNUMA node(s):                            2\nNUMA node0 CPU(s):                       0-15,32-47\nNUMA node1 CPU(s):                       16-31,48-63\nVulnerability Gather data sampling:      Mitigation; Microcode\nVulnerability Indirect target selection: Mitigation; Aligned branch/return thunks\nVulnerability Itlb multihit:             KVM: Mitigation: VMX disabled\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Mitigation; Clear CPU buffers; SMT vulnerable\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Mitigation; Enhanced IBRS\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl and seccomp\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI SW loop, KVM SW loop\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Mitigation; TSX disabled\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n\nVersions of relevant libraries:\n[pip3] mypy-extensions==1.0.0\n[pip3] numpy==1.26.4\n[pip3] onnx==1.17.0\n[pip3] optree==0.13.1\n[pip3] pytorch-triton==3.0.0+72734f086\n[pip3] torch==2.6.0a0+df5bbc09d1.nv24.12\n[pip3] torch_tensorrt==2.6.0a0\n[pip3] torchprofile==0.0.4\n[pip3] torchvision==0.20.0a0\n[conda] Could not collect",
+  "transformers_version": "4.46.3",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<unk>",
+    "0"
+  ],
+  "tokenizer_eos_token": [
+    "</s>",
+    "2"
+  ],
+  "tokenizer_bos_token": [
+    "<s>",
+    "1"
+  ],
+  "eot_token_id": 2,
+  "max_length": 2048,
+  "task_hashes": {},
+  "model_source": "hf",
+  "model_name": "maritaca-ai/sabia-7b",
+  "model_name_sanitized": "maritaca-ai__sabia-7b",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": false,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "start_time": 14295417.017705714,
+  "end_time": 14306188.877069984,
+  "total_evaluation_time_seconds": "10771.859364269301"
+}

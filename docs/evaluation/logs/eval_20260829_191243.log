@@ -1,0 +1,17 @@
+[eval] device=cuda  modelo=NOVA-vision-language/GlorIA-1.3B
+[eval] tokenizador=HF(50257)  janela=2048 stride=1024 lowercase=False
+[eval] CALAME: baixando calamept_all.jsonl do HF (sem pip)...
+[eval] CALAME-PT: 2075 exemplos
+[eval] ---- modelagem de linguagem (texto reservado) ----
+[eval]   BPB (bits/byte)   : 0.8653   (menor e melhor)
+[eval]   perplexidade/token: 19.203
+[eval]   bits/token        : 4.2633
+[eval]   bytes/token       : 4.9271   (700 tokens, 3449 bytes)
+[eval] ---- BPB sobre CALAME (com IC) ----
+[eval]   BPB              : 0.7592   IC95% [0.7534, 0.7650]   (2075 frases)
+/usr/local/lib/python3.12/dist-packages/transformers/generation/configuration_utils.py:590: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.9` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+[eval] ---- CALAME-PT (com IC) ----
+[eval]   acuracia: 1253/2075 = 60.39%   SE 1.07%   IC95% [58.27%, 62.46%]
+[eval]   acertos por exemplo salvos em: /hf/gloria-1b3_calame.json
+[eval] RESUMO: {'model': 'NOVA-vision-language/GlorIA-1.3B', 'tokenizer': 'HF(50257)', 'tokens': 700, 'bytes': 3449, 'bytes_per_token': 4.9271, 'bits_per_token': 4.2633, 'ppl_token': 19.2032, 'bpb': 0.8653, 'bpb_calame': 0.7592, 'bpb_calame_ci95': [0.7534119018514293, 0.7649599623229156], 'bpb_calame_nseg': 2075, 'calame_acc': 0.6039, 'calame_se': 0.0107, 'calame_ci95': [0.5826506024096385, 0.624578313253012], 'calame_n': 2075}

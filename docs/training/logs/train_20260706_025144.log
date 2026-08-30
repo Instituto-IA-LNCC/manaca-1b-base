@@ -1,0 +1,413 @@
+W0706 02:51:49.955000 1 torch/distributed/run.py:793] 
+W0706 02:51:49.955000 1 torch/distributed/run.py:793] *****************************************
+W0706 02:51:49.955000 1 torch/distributed/run.py:793] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0706 02:51:49.955000 1 torch/distributed/run.py:793] *****************************************
+/opt/Megatron-LM/megatron/core/tensor_parallel/cross_entropy.py:75: SyntaxWarning: invalid escape sequence '\s'
+  """
+/opt/Megatron-LM/megatron/core/tensor_parallel/cross_entropy.py:75: SyntaxWarning: invalid escape sequence '\s'
+  """
+/opt/Megatron-LM/megatron/core/parallel_state.py:110: SyntaxWarning: invalid escape sequence '\i'
+  """Generate orthogonal parallel groups based on the parallel size and mask.
+/opt/Megatron-LM/megatron/core/parallel_state.py:110: SyntaxWarning: invalid escape sequence '\i'
+  """Generate orthogonal parallel groups based on the parallel size and mask.
+/opt/Megatron-LM/megatron/core/tensor_parallel/layers.py:259: FutureWarning: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+  @custom_fwd
+/opt/Megatron-LM/megatron/core/tensor_parallel/layers.py:270: FutureWarning: `torch.cuda.amp.custom_bwd(args...)` is deprecated. Please use `torch.amp.custom_bwd(args..., device_type='cuda')` instead.
+  @custom_bwd
+/opt/Megatron-LM/megatron/core/tensor_parallel/layers.py:340: FutureWarning: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+  @custom_fwd
+/opt/Megatron-LM/megatron/core/tensor_parallel/layers.py:377: FutureWarning: `torch.cuda.amp.custom_bwd(args...)` is deprecated. Please use `torch.amp.custom_bwd(args..., device_type='cuda')` instead.
+  @custom_bwd
+/opt/Megatron-LM/megatron/core/tensor_parallel/layers.py:259: FutureWarning: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+  @custom_fwd
+/opt/Megatron-LM/megatron/core/tensor_parallel/layers.py:270: FutureWarning: `torch.cuda.amp.custom_bwd(args...)` is deprecated. Please use `torch.amp.custom_bwd(args..., device_type='cuda')` instead.
+  @custom_bwd
+/opt/Megatron-LM/megatron/core/tensor_parallel/layers.py:340: FutureWarning: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+  @custom_fwd
+/opt/Megatron-LM/megatron/core/tensor_parallel/layers.py:377: FutureWarning: `torch.cuda.amp.custom_bwd(args...)` is deprecated. Please use `torch.amp.custom_bwd(args..., device_type='cuda')` instead.
+  @custom_bwd
+/opt/Megatron-LM/megatron/training/arguments.py:969: SyntaxWarning: invalid escape sequence '\ '
+  '   --rampup-batch-size 16 8 300000 \ '
+/opt/Megatron-LM/megatron/training/arguments.py:969: SyntaxWarning: invalid escape sequence '\ '
+  '   --rampup-batch-size 16 8 300000 \ '
+/opt/Megatron-LM/megatron/core/datasets/gpt_dataset.py:95: SyntaxWarning: assertion is always true, perhaps remove parentheses?
+  assert (
+/opt/Megatron-LM/megatron/core/datasets/gpt_dataset.py:95: SyntaxWarning: assertion is always true, perhaps remove parentheses?
+  assert (
+using world size: 2, data-parallel size: 2, context-parallel size: 1 tensor-model-parallel size: 1, pipeline-model-parallel size: 1 
+WARNING: overriding default arguments for tokenizer_type:GPT2BPETokenizer                        with tokenizer_type:SentencePieceTokenizer
+WARNING: Setting args.overlap_p2p_comm to False since non-interleaved schedule does not support overlapping p2p communication
+accumulate and all-reduce gradients in fp32 for bfloat16 data type.
+using torch.bfloat16 for parameters ...
+------------------------ arguments ------------------------
+  accumulate_allreduce_grads_in_fp32 .............. True
+  adam_beta1 ...................................... 0.9
+  adam_beta2 ...................................... 0.999
+  adam_eps ........................................ 1e-08
+  add_bias_linear ................................. True
+  add_position_embedding .......................... True
+  add_qkv_bias .................................... False
+  adlr_autoresume ................................. False
+  adlr_autoresume_interval ........................ 1000
+  apply_layernorm_1p .............................. False
+  apply_query_key_layer_scaling ................... False
+  apply_residual_connection_post_layernorm ........ False
+  apply_rope_fusion ............................... True
+  async_tensor_model_parallel_allreduce ........... True
+  attention_dropout ............................... 0.1
+  attention_softmax_in_fp32 ....................... False
+  auto_detect_ckpt_format ......................... False
+  barrier_with_L1_time ............................ True
+  bert_binary_head ................................ True
+  bert_embedder_type .............................. megatron
+  bert_load ....................................... None
+  bf16 ............................................ True
+  bias_dropout_fusion ............................. True
+  bias_gelu_fusion ................................ True
+  bias_swiglu_fusion .............................. True
+  biencoder_projection_dim ........................ 0
+  biencoder_shared_query_context_model ............ False
+  block_data_path ................................. None
+  check_for_nan_in_loss_and_grad .................. True
+  ckpt_fully_parallel_save ........................ False
+  ckpt_step ....................................... None
+  classes_fraction ................................ 1.0
+  clip_grad ....................................... 1.0
+  clone_scatter_output_in_embedding ............... True
+  consumed_train_samples .......................... 0
+  consumed_train_tokens ........................... 0
+  consumed_valid_samples .......................... 0
+  context_parallel_size ........................... 1
+  create_attention_mask_in_dataloader ............. True
+  data_cache_path ................................. None
+  data_parallel_random_init ....................... False
+  data_parallel_size .............................. 2
+  data_path ....................................... ['/workspace/manaca-corpus/megatron-data/manaca_text_text_document']
+  data_per_class_fraction ......................... 1.0
+  data_sharding ................................... True
+  dataloader_type ................................. single
+  ddp_bucket_size ................................. None
+  decoder_num_layers .............................. None
+  decoder_seq_length .............................. None
+  decoupled_lr .................................... None
+  decoupled_min_lr ................................ None
+  delay_grad_reduce ............................... True
+  delay_param_gather .............................. False
+  dino_bottleneck_size ............................ 256
+  dino_freeze_last_layer .......................... 1
+  dino_head_hidden_size ........................... 2048
+  dino_local_crops_number ......................... 10
+  dino_local_img_size ............................. 96
+  dino_norm_last_layer ............................ False
+  dino_teacher_temp ............................... 0.07
+  dino_warmup_teacher_temp ........................ 0.04
+  dino_warmup_teacher_temp_epochs ................. 30
+  disable_straggler_on_startup .................... False
+  dist_ckpt_format ................................ torch_dist
+  distribute_saved_activations .................... False
+  distributed_backend ............................. nccl
+  distributed_timeout_minutes ..................... 10
+  dynamic_checkpointing_min ....................... 0
+  embedding_path .................................. None
+  empty_unused_memory_level ....................... 0
+  enable_one_logger ............................... False
+  encoder_num_layers .............................. 24
+  encoder_seq_length .............................. 4096
+  end_weight_decay ................................ 0.1
+  eod_mask_loss ................................... False
+  eval_interval ................................... 1000
+  eval_iters ...................................... 100
+  evidence_data_path .............................. None
+  exit_duration_in_mins ........................... None
+  exit_interval ................................... None
+  exit_on_missing_checkpoint ...................... False
+  exit_signal_handler ............................. False
+  expert_model_parallel_size ...................... 1
+  ffn_hidden_size ................................. 8192
+  finetune ........................................ False
+  force_stop_iter ................................. None
+  fp16 ............................................ False
+  fp16_lm_cross_entropy ........................... False
+  fp32_residual_connection ........................ False
+  fp8 ............................................. None
+  fp8_amax_compute_algo ........................... most_recent
+  fp8_amax_history_len ............................ 1
+  fp8_interval .................................... 1
+  fp8_margin ...................................... 0
+  fp8_wgrad ....................................... True
+  global_batch_size ............................... 512
+  gradient_accumulation_fusion .................... True
+  group_query_attention ........................... True
+  head_lr_mult .................................... 1.0
+  hidden_dropout .................................. 0.1
+  hidden_size ..................................... 2048
+  hysteresis ...................................... 2
+  ict_head_size ................................... None
+  ict_load ........................................ None
+  img_h ........................................... 224
+  img_w ........................................... 224
+  indexer_batch_size .............................. 128
+  indexer_log_interval ............................ 1000
+  inference_batch_times_seqlen_threshold .......... 512
+  init_method_std ................................. 0.02
+  init_method_xavier_uniform ...................... False
+  initial_loss_scale .............................. 4294967296
+  iter_per_epoch .................................. 1250
+  kv_channels ..................................... 64
+  lazy_mpu_init ................................... None
+  load ............................................ None
+  local_rank ...................................... None
+  log_batch_size_to_tensorboard ................... False
+  log_interval .................................... 10
+  log_learning_rate_to_tensorboard ................ True
+  log_loss_scale_to_tensorboard ................... True
+  log_memory_to_tensorboard ....................... False
+  log_num_zeros_in_grad ........................... False
+  log_params_norm ................................. False
+  log_progress .................................... False
+  log_straggler ................................... False
+  log_throughput .................................. False
+  log_timers_to_tensorboard ....................... True
+  log_validation_ppl_to_tensorboard ............... True
+  log_world_size_to_tensorboard ................... False
+  loss_scale ...................................... None
+  loss_scale_window ............................... 1000
+  lr .............................................. 0.0003
+  lr_decay_iters .................................. 20000
+  lr_decay_samples ................................ None
+  lr_decay_style .................................. cosine
+  lr_warmup_fraction .............................. None
+  lr_warmup_init .................................. 0.0
+  lr_warmup_iters ................................. 2000
+  lr_warmup_samples ............................... 0
+  make_vocab_size_divisible_by .................... 128
+  manual_gc ....................................... False
+  manual_gc_eval .................................. True
+  manual_gc_interval .............................. 0
+  mask_factor ..................................... 1.0
+  mask_prob ....................................... 0.15
+  mask_type ....................................... random
+  masked_softmax_fusion ........................... True
+  max_position_embeddings ......................... 4096
+  max_tokens_to_oom ............................... 12000
+  merge_file ...................................... None
+  micro_batch_size ................................ 1
+  min_loss_scale .................................. 1.0
+  min_lr .......................................... 3e-05
+  mmap_bin_files .................................. True
+  mock_data ....................................... False
+  moe_aux_loss_coeff .............................. 0.0
+  moe_grouped_gemm ................................ False
+  moe_input_jitter_eps ............................ None
+  moe_per_layer_logging ........................... False
+  moe_router_load_balancing_type .................. aux_loss
+  moe_router_topk ................................. 2
+  moe_token_dispatcher_type ....................... allgather
+  moe_token_dropping .............................. False
+  moe_z_loss_coeff ................................ None
+  nccl_communicator_config_path ................... None
+  no_load_optim ................................... None
+  no_load_rng ..................................... None
+  no_persist_layer_norm ........................... False
+  no_save_optim ................................... None
+  no_save_rng ..................................... None
+  norm_epsilon .................................... 1e-05
+  normalization ................................... RMSNorm
+  num_attention_heads ............................. 32
+  num_channels .................................... 3
+  num_classes ..................................... 1000
+  num_experts ..................................... None
+  num_layers ...................................... 24
+  num_layers_per_virtual_pipeline_stage ........... None
+  num_query_groups ................................ 8
+  num_workers ..................................... 2
+  one_logger_entity ............................... hwinf_dcm
+  one_logger_project .............................. e2e-tracking
+  one_logger_run_name ............................. None
+  onnx_safe ....................................... None
+  openai_gelu ..................................... False
+  optimizer ....................................... adam
+  output_bert_embeddings .......................... False
+  overlap_grad_reduce ............................. True
+  overlap_p2p_comm ................................ False
+  overlap_param_gather ............................ True
+  override_opt_param_scheduler .................... False
+  params_dtype .................................... torch.bfloat16
+  patch_dim ....................................... 16
+  perform_initialization .......................... True
+  pipeline_model_parallel_size .................... 1
+  pipeline_model_parallel_split_rank .............. None
+  position_embedding_type ......................... rope
+  pretrained_checkpoint ........................... None
+  profile ......................................... False
+  profile_ranks ................................... [0]
+  profile_step_end ................................ 12
+  profile_step_start .............................. 10
+  qk_layernorm .................................... False
+  query_in_block_prob ............................. 0.1
+  rampup_batch_size ............................... None
+  rank ............................................ 0
+  recompute_granularity ........................... full
+  recompute_method ................................ uniform
+  recompute_num_layers ............................ 1
+  reset_attention_mask ............................ False
+  reset_position_ids .............................. False
+  retriever_report_topk_accuracies ................ []
+  retriever_score_scaling ......................... False
+  retriever_seq_length ............................ 256
+  retro_add_retriever ............................. False
+  retro_attention_gate ............................ 1
+  retro_cyclic_train_iters ........................ None
+  retro_encoder_attention_dropout ................. 0.1
+  retro_encoder_hidden_dropout .................... 0.1
+  retro_encoder_layers ............................ 2
+  retro_num_neighbors ............................. 2
+  retro_num_retrieved_chunks ...................... 2
+  retro_project_dir ............................... None
+  retro_verify_neighbor_count ..................... True
+  rope_theta ...................................... 500000.0
+  rotary_interleaved .............................. False
+  rotary_percent .................................. 1.0
+  rotary_seq_len_interpolation_factor ............. None
+  sample_rate ..................................... 1.0
+  save ............................................ /workspace/checkpoints/manaca-1b
+  save_interval ................................... None
+  save_iter_patterns .............................. None
+  scatter_gather_tensors_in_pipeline .............. True
+  seed ............................................ 1234
+  seq_length ...................................... 4096
+  sequence_parallel ............................... False
+  sgd_momentum .................................... 0.9
+  short_seq_prob .................................. 0.1
+  skip_train ...................................... False
+  skip_train_iteration_range ...................... None
+  spec ............................................ None
+  split ........................................... 969, 30, 1
+  squared_relu .................................... False
+  standalone_embedding_stage ...................... False
+  start_weight_decay .............................. 0.1
+  straggler_ctrlr_port ............................ 65535
+  straggler_minmax_count .......................... 1
+  swiglu .......................................... True
+  swin_backbone_type .............................. tiny
+  tensor_model_parallel_size ...................... 1
+  tensorboard_dir ................................. /workspace/checkpoints/manaca-1b/tensorboard
+  tensorboard_log_interval ........................ 1
+  tensorboard_queue_size .......................... 1000
+  test_data_path .................................. None
+  test_mode ....................................... False
+  timing_log_level ................................ 0
+  timing_log_option ............................... minmax
+  titles_data_path ................................ None
+  tokenizer_model ................................. /workspace/manaca-corpus/tokenizer/manaca-tokenizer.model
+  tokenizer_type .................................. SentencePieceTokenizer
+  tp_comm_bulk_dgrad .............................. True
+  tp_comm_bulk_wgrad .............................. True
+  tp_comm_overlap ................................. False
+  tp_comm_overlap_ag .............................. True
+  tp_comm_overlap_cfg ............................. None
+  tp_comm_overlap_rs .............................. True
+  tp_comm_overlap_rs_dgrad ........................ False
+  tp_comm_split_ag ................................ True
+  tp_comm_split_rs ................................ True
+  train_data_path ................................. None
+  train_iters ..................................... 20000
+  train_samples ................................... None
+  transformer_impl ................................ transformer_engine
+  transformer_pipeline_model_parallel_size ........ 1
+  untie_embeddings_and_output_weights ............. True
+  use_checkpoint_args ............................. False
+  use_checkpoint_opt_param_scheduler .............. False
+  use_cpu_initialization .......................... None
+  use_dist_ckpt ................................... False
+  use_distributed_optimizer ....................... True
+  use_embedding_scaling ........................... False
+  use_flash_attn .................................. True
+  use_gcp_dynamic_checkpointing ................... False
+  use_mcore_models ................................ True
+  use_mpi ......................................... False
+  use_one_sent_docs ............................... False
+  use_ring_exchange_p2p ........................... False
+  use_rotary_position_embeddings .................. False
+  use_tp_pp_dp_mapping ............................ False
+  use_z_loss ...................................... True
+  valid_data_path ................................. None
+  variable_seq_lengths ............................ False
+  virtual_pipeline_model_parallel_size ............ None
+  vision_backbone_type ............................ vit
+  vision_pretraining .............................. False
+  vision_pretraining_type ......................... classify
+  vocab_extra_ids ................................. 0
+  vocab_file ...................................... None
+  vocab_size ...................................... None
+  wandb_entity .................................... None
+  wandb_id ........................................ None
+  wandb_name ...................................... None
+  wandb_project ................................... None
+  wandb_save_dir .................................. 
+  weight_decay .................................... 0.1
+  weight_decay_incr_style ......................... constant
+  world_size ...................................... 2
+  yaml_cfg ........................................ None
+-------------------- end of arguments ---------------------
+setting number of micro-batches to constant 256
+> building SentencePieceTokenizer tokenizer ...
+ > padded vocab (size: 64004) with 124 dummy tokens (new size: 64128)
+> initializing torch distributed ...
+> setting tensorboard ...
+> initialized tensor model parallel with size 1
+> initialized pipeline model parallel with size 1
+> setting random seeds to 1234 ...
+[rank1]:[W706 02:51:57.867452559 ProcessGroupNCCL.cpp:4170] [PG ID 0 PG GUID 0 Rank 1]  using GPU 1 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+> compiling dataset index builder ...
+make: Entering directory '/opt/Megatron-LM/megatron/core/datasets'
+g++ -O3 -Wall -shared -std=c++11 -fPIC -fdiagnostics-color -I/usr/include/python3.12 -I/usr/local/lib/python3.12/dist-packages/pybind11/include helpers.cpp -o helpers.cpython-312-x86_64-linux-gnu.so
+make: Leaving directory '/opt/Megatron-LM/megatron/core/datasets'
+>>> done with dataset index builder. Compilation time: 7.216 seconds
+> compiling and loading fused kernels ...
+[rank0]:[W706 02:52:05.395092583 ProcessGroupNCCL.cpp:4170] [PG ID 0 PG GUID 0 Rank 0]  using GPU 0 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+NCCL version 2.23.4+cuda12.6
+>>> done with compiling and loading fused kernels. Compilation time: 0.589 seconds
+[rank1]:[W706 02:52:05.676529768 init.cpp:767] Warning: nvfuser is no longer supported in torch script, use _jit_set_nvfuser_enabled is deprecated and a no-op (function operator())
+[rank0]:[W706 02:52:05.676540500 init.cpp:767] Warning: nvfuser is no longer supported in torch script, use _jit_set_nvfuser_enabled is deprecated and a no-op (function operator())
+time to initialize megatron (seconds): 14.303
+[after megatron is initialized] datetime: 2026-07-06 02:52:10 
+building GPT model ...
+ > number of parameters on (tensor, pipeline) model parallel rank (0, 0): 1722951680
+> learning rate decay style: cosine
+[after model, optimizer, and learning rate scheduler are built] datetime: 2026-07-06 02:52:10 
+> building train, validation, and test datasets ...
+ > datasets target sizes (minimum size):
+    train:      10240000
+    validation: 1075200
+    test:       51200
+> building train, validation, and test datasets for GPT ...
+> finished creating GPT datasets ...
+[after dataloaders are built] datetime: 2026-07-06 02:52:11 
+done with setup ...
+/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed._all_gather_base` is a private function and will be deprecated. Please use `torch.distributed.all_gather_into_tensor` instead.
+  return func(*args, **kwargs)
+/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed._all_gather_base` is a private function and will be deprecated. Please use `torch.distributed.all_gather_into_tensor` instead.
+  return func(*args, **kwargs)
+(min, max) time across ranks (ms):
+    model-and-optimizer-setup ......................: (176.51, 181.16)
+    train/valid/test-data-iterators-setup ..........: (230.39, 270.87)
+training ...
+saving checkpoint at iteration       0 to /workspace/checkpoints/manaca-1b in torch format
+  successfully saved checkpoint at iteration       0 to /workspace/checkpoints/manaca-1b
+(min, max) time across ranks (ms):
+    save-checkpoint ................................: (5920.74, 5920.92)
+[before the start of training step] datetime: 2026-07-06 02:52:17 
+NCCL version 2.23.4+cuda12.6
+/opt/Megatron-LM/megatron/core/distributed/param_and_grad_buffer.py:126: FutureWarning: `torch.distributed._reduce_scatter_base` is a private function and will be deprecated. Please use `torch.distributed.reduce_scatter_tensor` instead.
+  self.communication_handle = torch.distributed._reduce_scatter_base(
+/opt/Megatron-LM/megatron/core/distributed/param_and_grad_buffer.py:126: FutureWarning: `torch.distributed._reduce_scatter_base` is a private function and will be deprecated. Please use `torch.distributed.reduce_scatter_tensor` instead.
+  self.communication_handle = torch.distributed._reduce_scatter_base(
+/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed._all_gather_base` is a private function and will be deprecated. Please use `torch.distributed.all_gather_into_tensor` instead.
+  return func(*args, **kwargs)
+/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed._all_gather_base` is a private function and will be deprecated. Please use `torch.distributed.all_gather_into_tensor` instead.
+  return func(*args, **kwargs)
+saving checkpoint at iteration       1 to /workspace/checkpoints/manaca-1b in torch format
+  successfully saved checkpoint at iteration       1 to /workspace/checkpoints/manaca-1b
+(min, max) time across ranks (ms):
+    save-checkpoint ................................: (77604.62, 77604.74)

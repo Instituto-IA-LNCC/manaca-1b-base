@@ -1,0 +1,37 @@
+# Contexto de build enxuto — o código é montado via bind mount, não copiado.
+.git
+.github
+data
+hf-cache
+checkpoints
+wandb
+runs
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Artefatos grandes (nunca no contexto de build)
+*.bin
+*.pt
+*.safetensors
+*.gguf
+*.ggml
+*.parquet
+*.docx
+*.xlsx
+*.pptx
+*.pdf
+*.zip
+
+# Segredos e locais
+.env
+.claude/
+.vscode/
+.idea/
+.DS_Store

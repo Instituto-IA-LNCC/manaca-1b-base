@@ -1,0 +1,45 @@
+# Manacá — Dependências da imagem CPU (Fase 1: Corpus + Fase 2a: Tokenizador)
+# ---------------------------------------------------------------------------
+# Ambiente reproduzido em Docker (ver docs/environment/setup-guide-docker-pt.md).
+# Versões pinadas para reprodutibilidade.
+
+# Aquisição e datasets HuggingFace
+datasets==4.8.4
+huggingface_hub==0.36.2
+
+# Pipeline de larga escala (Common Crawl, dedup distribuído)
+# Extras: `processing` (filtros/langid) + `io` (warcio/faust-cchardet/python-magic)
+# — o extra `io` é obrigatório para o WarcReader do Script 07 (Common Crawl).
+datatrove[processing,io]==0.9.0
+
+# Armazenamento colunar Parquet + Zstandard
+pyarrow==23.0.1
+zstandard==0.25.0
+
+# Deduplicação MinHash LSH
+datasketch==1.9.0
+xxhash==3.6.0
+
+# Identificação de idioma (compatível com NumPy 2.x)
+fasttext-numpy2-wheel==0.9.2
+
+# Tokenização (Fase 2a) e contagem de tokens
+tokenizers==0.22.2
+sentencepiece==0.2.0
+
+# Extração de conteúdo web (pipeline Common Crawl)
+trafilatura==1.11.0
+
+# Numérico / dados
+numpy==2.4.4
+pandas==3.0.2
+scipy==1.17.1
+regex==2026.3.32
+
+# Observabilidade e utilidades
+loguru==0.7.3
+rich==14.3.3
+tqdm==4.67.3
+pyyaml==6.0.3
+requests==2.32.3
+fsspec==2024.9.0

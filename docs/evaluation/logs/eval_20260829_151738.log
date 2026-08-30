@@ -1,0 +1,12 @@
+[eval] device=cuda  modelo=/m
+[eval] tokenizador=SPM(64000)  janela=2048 stride=1024 lowercase=False
+[eval] CALAME: baixando calamept_all.jsonl do HF (sem pip)...
+[eval] CALAME-PT: 2075 exemplos
+[eval] ---- modelagem de linguagem ----
+[eval]   BPB (bits/byte)   : 0.7020   (menor e melhor)
+[eval]   perplexidade/token: 12.617
+[eval]   bits/token        : 3.6573
+[eval]   bytes/token       : 5.2100   (662 tokens, 3449 bytes)
+[eval] ---- CALAME-PT ----
+[eval]   acuracia ultima palavra: 1258/2075 = 60.63%
+[eval] RESUMO: {'model': '/m', 'tokenizer': 'SPM(64000)', 'tokens': 662, 'bytes': 3449, 'bytes_per_token': 5.21, 'bits_per_token': 3.6573, 'ppl_token': 12.6171, 'bpb': 0.702, 'calame_acc': 0.6063, 'calame_n': 2075}

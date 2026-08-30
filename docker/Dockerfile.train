@@ -1,0 +1,57 @@
+# syntax=docker/dockerfile:1
+# =============================================================================
+# Manacá — Imagem GPU: Fase 2b (Pré-Treinamento distribuído com Megatron-LM)
+# =============================================================================
+# Substitui o fluxo HPC "module load cuda + Singularity (.sif) + srun" por uma
+# imagem Docker. A base é o container NGC PyTorch (CUDA, cuDNN, NCCL, PyTorch,
+# Apex, Transformer-Engine e FlashAttention já compilados) — o mesmo runtime que
+# em HPC seria empacotado como .sif via `singularity build ... docker://...`.
+#
+# Base parametrizável: se nvcr.io estiver bloqueado pela política de rede, use
+#   --build-arg BASE_IMAGE=pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel
+# (nesse caso instale flash-attn/apex conforme necessário — ver docs).
+ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:24.12-py3
+FROM ${BASE_IMAGE}
+
+# Fork do Megatron-LM usado pelo LLM-jp (plano de execução §7.1) e branch.
+ARG MEGATRON_REPO=https://github.com/llm-jp/Megatron-LM.git
+ARG MEGATRON_REF=nii-geniac
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    WORK_DIR=/workspace/manaca-corpus \
+    HF_HOME=/workspace/hf-cache \
+    CKPT_DIR=/workspace/checkpoints \
+    MEGATRON_PATH=/opt/Megatron-LM \
+    PYTHONPATH=/opt/Megatron-LM \
+    # NCCL: bons defaults para GPU única/multi-GPU num nó; ajuste em multinó.
+    NCCL_DEBUG=WARN
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Dependências além da base NGC (não fixa torch para não conflitar com a base).
+COPY requirements/train.txt /tmp/requirements/train.txt
+RUN python -m pip install -r /tmp/requirements/train.txt
+
+# Clona o Megatron-LM (fork LLM-jp). Falha graciosamente se a ref não existir,
+# permitindo trocar repo/ref via build args.
+RUN git clone --depth 1 --branch "${MEGATRON_REF}" "${MEGATRON_REPO}" "${MEGATRON_PATH}" \
+    || git clone --depth 1 "${MEGATRON_REPO}" "${MEGATRON_PATH}"
+
+# Compatibilidade setuptools: o fork nii-geniac usa `from pkg_resources import
+# packaging`, removido no setuptools>=70 (e pkg_resources some de vez no 82).
+# A imagem NGC traz setuptools novo; fixamos uma versão que ainda expõe
+# pkg_resources.packaging, para o preprocess_data.py e o pretrain_gpt.py importarem.
+RUN python -m pip install "setuptools==69.5.1"
+
+WORKDIR /workspace/manaca
+
+COPY docker/entrypoint.sh /usr/local/bin/manaca-entrypoint
+RUN chmod +x /usr/local/bin/manaca-entrypoint
+ENTRYPOINT ["/usr/local/bin/manaca-entrypoint"]
+
+# Sem comando: mostra a config de GPU visível ao container.
+CMD ["python", "-c", "import torch; print('CUDA disponivel:', torch.cuda.is_available(), '| GPUs:', torch.cuda.device_count())"]

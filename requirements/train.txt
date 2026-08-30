@@ -1,0 +1,27 @@
+# Manacá — Dependências extras da imagem GPU de PRÉ-TREINAMENTO (Fase 2b)
+# ------------------------------------------------------------------------
+# A base (docker/Dockerfile.train) é uma imagem NGC PyTorch que já fornece
+# CUDA, cuDNN, NCCL, PyTorch, Apex, Transformer-Engine e FlashAttention.
+# Aqui instalamos apenas o que o Megatron-LM (fork llm-jp/Megatron-LM) e a
+# conversão para HuggingFace exigem além da base. NÃO fixamos torch aqui para
+# não conflitar com a versão compilada da imagem base.
+
+# Tokenizador SentencePiece usado pelo Megatron (--tokenizer-type SentencePieceTokenizer)
+sentencepiece==0.2.0
+
+# Conversão de checkpoints Megatron -> HuggingFace safetensors (Fase 2b §7.10)
+transformers==4.46.3
+accelerate==1.1.1
+safetensors==0.4.5
+
+# Pré-processamento de dados do Megatron (tools/preprocess_data.py)
+nltk==3.9.1
+einops==0.8.0
+regex==2024.11.6
+
+# Monitoramento de treino
+wandb==0.18.7
+tensorboard==2.18.0
+
+# Leitura do corpus Parquet para gerar .bin/.idx do Megatron
+pyarrow==17.0.0

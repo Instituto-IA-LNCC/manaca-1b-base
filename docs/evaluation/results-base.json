@@ -1,0 +1,360 @@
+{
+  "eval": "manaca-1b-base",
+  "date": "2026-08-29",
+  "description": "CALAME-PT e BPB do Manaca-1B base vs 9 modelos PT/PT-BR/multilingues, mesmo harness (scripts/eval), n=2075.",
+  "scripts": {
+    "runner": "scripts/eval/run_eval.sh",
+    "batch": "scripts/eval/run_batch_pt.sh",
+    "evaluator": "scripts/eval/eval_base.py",
+    "paired": "scripts/eval/paired_compare.py",
+    "scaling_plot": "scripts/eval/plot_scaling_pt.py",
+    "held_out_text": "scripts/eval/holdout_pt.txt"
+  },
+  "protocol": {
+    "bpb_window": 2048,
+    "bpb_stride": 1024,
+    "calame_source": "NOVA-vision-language/calame-pt",
+    "calame_file": "calamept_all.jsonl",
+    "calame_n": 2075,
+    "calame_decoding": "greedy",
+    "calame_match": "primeira palavra, case-insensitive",
+    "ci": "IC95% normal binomial (acc +- 1.96*SE)"
+  },
+  "results": [
+    {
+      "model": "nicholasKluge/TeenyTinyLlama-160m",
+      "nome": "TTL-160m",
+      "params_b": 0.16,
+      "tokenizer": "HF(32000)",
+      "tok_family": "llama-bpe",
+      "bpb_holdout": 0.9465,
+      "bpb_calame": 0.8383,
+      "bpb_calame_ci95": [
+        0.8329,
+        0.8438
+      ],
+      "calame_acc": 0.4733,
+      "calame_se": 0.011,
+      "calame_ci95": [
+        0.4517,
+        0.4949
+      ],
+      "calame_n": 2075
+    },
+    {
+      "model": "TucanoBR/Tucano-160m",
+      "nome": "Tucano-160m",
+      "params_b": 0.16,
+      "tokenizer": "HF(32000)",
+      "tok_family": "llama-bpe",
+      "bpb_holdout": 0.8424,
+      "bpb_calame": 0.7892,
+      "bpb_calame_ci95": [
+        0.7838,
+        0.7948
+      ],
+      "calame_acc": 0.5253,
+      "calame_se": 0.011,
+      "calame_ci95": [
+        0.5037,
+        0.5469
+      ],
+      "calame_n": 2075
+    },
+    {
+      "model": "nicholasKluge/TeenyTinyLlama-460m",
+      "nome": "TTL-460m",
+      "params_b": 0.46,
+      "tokenizer": "HF(32000)",
+      "tok_family": "llama-bpe",
+      "bpb_holdout": 0.8636,
+      "bpb_calame": 0.809,
+      "bpb_calame_ci95": [
+        0.8033,
+        0.8148
+      ],
+      "calame_acc": 0.5123,
+      "calame_se": 0.011,
+      "calame_ci95": [
+        0.4907,
+        0.5339
+      ],
+      "calame_n": 2075
+    },
+    {
+      "model": "TucanoBR/Tucano-630m",
+      "nome": "Tucano-630m",
+      "params_b": 0.63,
+      "tokenizer": "HF(32000)",
+      "tok_family": "llama-bpe",
+      "bpb_holdout": 0.7642,
+      "bpb_calame": 0.739,
+      "bpb_calame_ci95": [
+        0.7336,
+        0.7444
+      ],
+      "calame_acc": 0.5663,
+      "calame_se": 0.0109,
+      "calame_ci95": [
+        0.5449,
+        0.5877
+      ],
+      "calame_n": 2075
+    },
+    {
+      "model": "TucanoBR/Tucano-1b1",
+      "nome": "Tucano-1b1",
+      "params_b": 1.1,
+      "tokenizer": "HF(32000)",
+      "tok_family": "llama-bpe",
+      "bpb_holdout": 0.7194,
+      "bpb_calame": 0.7221,
+      "bpb_calame_ci95": [
+        0.7168,
+        0.7278
+      ],
+      "calame_acc": 0.5908,
+      "calame_se": 0.0108,
+      "calame_ci95": [
+        0.5696,
+        0.612
+      ],
+      "calame_n": 2075
+    },
+    {
+      "model": "NOVA-vision-language/GlorIA-1.3B",
+      "nome": "GlorIA-1b3",
+      "params_b": 1.3,
+      "tokenizer": "HF(50257) GPT-Neo BPE",
+      "tok_family": "byte-bpe",
+      "bpb_holdout": 0.8653,
+      "bpb_calame": 0.7592,
+      "bpb_calame_ci95": [
+        0.7534,
+        0.765
+      ],
+      "calame_acc": 0.6039,
+      "calame_se": 0.0107,
+      "calame_ci95": [
+        0.5829,
+        0.6249
+      ],
+      "calame_n": 2075
+    },
+    {
+      "model": "ai-forever/mGPT",
+      "nome": "mGPT-1b3",
+      "params_b": 1.3,
+      "tokenizer": "HF(100000) GPT2 BPE",
+      "tok_family": "byte-bpe",
+      "bpb_holdout": 1.2381,
+      "bpb_calame": 0.8144,
+      "bpb_calame_ci95": [
+        0.8088,
+        0.82
+      ],
+      "calame_acc": 0.5557,
+      "calame_se": 0.0109,
+      "calame_ci95": [
+        0.5343,
+        0.5771
+      ],
+      "calame_n": 2075
+    },
+    {
+      "model": "/m",
+      "nome": "Manaca-1B",
+      "params_b": 1.72,
+      "tokenizer": "SPM(64000) nmt_nfkc_cf",
+      "tok_family": "spm-pt",
+      "bpb_holdout": 0.702,
+      "bpb_calame": 0.7319,
+      "bpb_calame_ci95": [
+        0.7268,
+        0.7372
+      ],
+      "calame_acc": 0.6063,
+      "calame_se": 0.0107,
+      "calame_ci95": [
+        0.5853,
+        0.6273
+      ],
+      "calame_n": 2075
+    },
+    {
+      "model": "TucanoBR/Tucano-2b4",
+      "nome": "Tucano-2b4",
+      "params_b": 2.4,
+      "tokenizer": "HF(32000)",
+      "tok_family": "llama-bpe",
+      "bpb_holdout": 0.6909,
+      "bpb_calame": 0.7081,
+      "bpb_calame_ci95": [
+        0.703,
+        0.7136
+      ],
+      "calame_acc": 0.5957,
+      "calame_se": 0.0108,
+      "calame_ci95": [
+        0.5745,
+        0.6169
+      ],
+      "calame_n": 2075
+    },
+    {
+      "model": "maritaca-ai/sabia-7b",
+      "nome": "Sabia-7B",
+      "params_b": 7.0,
+      "tokenizer": "HF(32000) LLaMA SP",
+      "tok_family": "llama-bpe",
+      "bpb_holdout": 0.6459,
+      "bpb_calame": 0.7214,
+      "bpb_calame_ci95": [
+        0.7161,
+        0.7269
+      ],
+      "calame_acc": 0.6323,
+      "calame_se": 0.0106,
+      "calame_ci95": [
+        0.6115,
+        0.6531
+      ],
+      "calame_n": 2075
+    }
+  ],
+  "harness_validation": {
+    "nota": "Cruzamento das nossas acuracias CALAME com a tabela publicada do Tucano (github Nkluge-correa/Tucano). A familia SentencePiece/LLaMA-BPE PT-BR bate dentro de ~1 ponto; os modelos byte-level BPE (GlorIA, mGPT) divergem ~7-8 pontos, indicando que a extracao de ultima palavra por geracao e sensivel a familia de tokenizador. Numeros de GlorIA e mGPT sao PROVISORIOS ate alinhar o protocolo.",
+    "comparacoes": [
+      {
+        "nome": "TTL-160m",
+        "tok_family": "llama-bpe",
+        "calame_meu_pct": 47.33,
+        "calame_tucano_pub_pct": 46.72,
+        "delta_pct": 0.61
+      },
+      {
+        "nome": "Tucano-160m",
+        "tok_family": "llama-bpe",
+        "calame_meu_pct": 52.53,
+        "calame_tucano_pub_pct": 52.31,
+        "delta_pct": 0.22
+      },
+      {
+        "nome": "TTL-460m",
+        "tok_family": "llama-bpe",
+        "calame_meu_pct": 51.23,
+        "calame_tucano_pub_pct": 49.42,
+        "delta_pct": 1.81
+      },
+      {
+        "nome": "Tucano-630m",
+        "tok_family": "llama-bpe",
+        "calame_meu_pct": 56.63,
+        "calame_tucano_pub_pct": 56.55,
+        "delta_pct": 0.08
+      },
+      {
+        "nome": "Tucano-1b1",
+        "tok_family": "llama-bpe",
+        "calame_meu_pct": 59.08,
+        "calame_tucano_pub_pct": 58.24,
+        "delta_pct": 0.84
+      },
+      {
+        "nome": "GlorIA-1b3",
+        "tok_family": "byte-bpe",
+        "calame_meu_pct": 60.39,
+        "calame_tucano_pub_pct": 52.79,
+        "delta_pct": 7.6
+      },
+      {
+        "nome": "mGPT-1b3",
+        "tok_family": "byte-bpe",
+        "calame_meu_pct": 55.57,
+        "calame_tucano_pub_pct": 47.14,
+        "delta_pct": 8.43
+      },
+      {
+        "nome": "Tucano-2b4",
+        "tok_family": "llama-bpe",
+        "calame_meu_pct": 59.57,
+        "calame_tucano_pub_pct": 59.06,
+        "delta_pct": 0.51
+      }
+    ]
+  },
+  "paired_tests_manaca_vs": [
+    {
+      "B": "GlorIA-1b3",
+      "diff_points": 0.24,
+      "paired_ci95_points": [
+        -1.49,
+        1.93
+      ],
+      "mcnemar_b10": 173,
+      "mcnemar_b01": 168,
+      "mcnemar_p": 0.8285,
+      "significant_5pct": false
+    },
+    {
+      "B": "Sabia-7B",
+      "diff_points": -2.6,
+      "paired_ci95_points": [
+        -4.34,
+        -0.82
+      ],
+      "mcnemar_b10": 145,
+      "mcnemar_b01": 199,
+      "mcnemar_p": 0.0043,
+      "significant_5pct": true
+    },
+    {
+      "B": "mGPT-1b3",
+      "diff_points": 5.06,
+      "paired_ci95_points": [
+        3.23,
+        6.8
+      ],
+      "mcnemar_b10": 231,
+      "mcnemar_b01": 126,
+      "mcnemar_p": 0.0,
+      "significant_5pct": true
+    },
+    {
+      "B": "Tucano-1b1",
+      "diff_points": 1.54,
+      "paired_ci95_points": [
+        -0.34,
+        3.42
+      ],
+      "mcnemar_b10": 227,
+      "mcnemar_b01": 195,
+      "mcnemar_p": 0.1313,
+      "significant_5pct": false
+    },
+    {
+      "B": "Tucano-2b4",
+      "diff_points": 1.06,
+      "paired_ci95_points": [
+        -0.77,
+        2.89
+      ],
+      "mcnemar_b10": 212,
+      "mcnemar_b01": 190,
+      "mcnemar_p": 0.2949,
+      "significant_5pct": false
+    }
+  ],
+  "leitura": [
+    "Sabia-7B e o unico significativamente acima do Manaca (p=0.004); e 4x maior.",
+    "Manaca empata com Tucano-1b1, Tucano-2b4 e GlorIA-1b3 (mesmo porte).",
+    "Manaca supera significativamente o mGPT-1b3 multilingue (+5.06, p<0.001); conclusao robusta pois o mGPT esta super-pontuado no nosso harness.",
+    "Comparacao Manaca vs GlorIA e inconclusiva: GlorIA esta super-pontuado ~7.6 pts vs publicado, entao o empate pode ser artefato de protocolo."
+  ],
+  "pending": [
+    "re-rodar CALAME salvando as geracoes cruas para diagnosticar a sensibilidade de protocolo (case/whitespace) dos modelos byte-BPE",
+    "teste pareado Manaca vs Sabia por faixa de tamanho de contexto",
+    "Llama-3.2-1B / Qwen2.5-1.5B",
+    "corrigir tokenizador HF (NFKC + Lowercase) antes de publicar no Hub"
+  ]
+}

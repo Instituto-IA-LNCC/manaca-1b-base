@@ -1,0 +1,18 @@
+[eval] device=cuda  modelo=maritaca-ai/sabia-7b
+Downloading shards:   0%|          | 0/3 [00:00<?, ?it/s]Downloading shards:  33%|███▎      | 1/3 [00:53<01:47, 53.95s/it]Downloading shards:  67%|██████▋   | 2/3 [01:42<00:50, 50.62s/it]Downloading shards: 100%|██████████| 3/3 [02:24<00:00, 46.84s/it]Downloading shards: 100%|██████████| 3/3 [02:24<00:00, 48.19s/it]
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 1/3 [00:01<00:02,  1.46s/it]Loading checkpoint shards:  67%|██████▋   | 2/3 [00:02<00:01,  1.13s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:03<00:00,  1.08it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:03<00:00,  1.01s/it]
+You are using the default legacy behaviour of the <class 'transformers.models.llama.tokenization_llama_fast.LlamaTokenizerFast'>. This is expected, and simply means that the `legacy` (previous) behavior will be used so nothing changes for you. If you want to use the new behaviour, set `legacy=False`. This should only be set if you understand what it means, and thoroughly read the reason why this was added as explained in https://github.com/huggingface/transformers/pull/24565 - if you loaded a llama tokenizer from a GGUF file you can ignore this message.
+[eval] tokenizador=HF(32000)  janela=2048 stride=1024 lowercase=False
+[eval] CALAME: baixando calamept_all.jsonl do HF (sem pip)...
+[eval] CALAME-PT: 2075 exemplos
+[eval] ---- modelagem de linguagem (texto reservado) ----
+[eval]   BPB (bits/byte)   : 0.6459   (menor e melhor)
+[eval]   perplexidade/token: 4.370
+[eval]   bits/token        : 2.1276
+[eval]   bytes/token       : 3.2942   (1047 tokens, 3449 bytes)
+[eval] ---- BPB sobre CALAME (com IC) ----
+[eval]   BPB              : 0.7214   IC95% [0.7161, 0.7269]   (2075 frases)
+[eval] ---- CALAME-PT (com IC) ----
+[eval]   acuracia: 1312/2075 = 63.23%   SE 1.06%   IC95% [61.11%, 65.35%]
+[eval]   acertos por exemplo salvos em: /hf/sabia-7b_calame.json
+[eval] RESUMO: {'model': 'maritaca-ai/sabia-7b', 'tokenizer': 'HF(32000)', 'tokens': 1047, 'bytes': 3449, 'bytes_per_token': 3.2942, 'bits_per_token': 2.1276, 'ppl_token': 4.37, 'bpb': 0.6459, 'bpb_calame': 0.7214, 'bpb_calame_ci95': [0.7161085514243368, 0.7268974675741082], 'bpb_calame_nseg': 2075, 'calame_acc': 0.6323, 'calame_se': 0.0106, 'calame_ci95': [0.6110843373493976, 0.6534939759036145], 'calame_n': 2075}

@@ -1,0 +1,15 @@
+[eval] device=cuda  modelo=ai-forever/mGPT
+[eval] tokenizador=HF(100000)  janela=2048 stride=1024 lowercase=False
+[eval] CALAME: baixando calamept_all.jsonl do HF (sem pip)...
+[eval] CALAME-PT: 2075 exemplos
+[eval] ---- modelagem de linguagem (texto reservado) ----
+[eval]   BPB (bits/byte)   : 1.2381   (menor e melhor)
+[eval]   perplexidade/token: 29.453
+[eval]   bits/token        : 4.8804
+[eval]   bytes/token       : 3.9417   (875 tokens, 3449 bytes)
+[eval] ---- BPB sobre CALAME (com IC) ----
+[eval]   BPB              : 0.8144   IC95% [0.8088, 0.8200]   (2075 frases)
+[eval] ---- CALAME-PT (com IC) ----
+[eval]   acuracia: 1153/2075 = 55.57%   SE 1.09%   IC95% [53.49%, 57.69%]
+[eval]   acertos por exemplo salvos em: /hf/mgpt-1b3_calame.json
+[eval] RESUMO: {'model': 'ai-forever/mGPT', 'tokenizer': 'HF(100000)', 'tokens': 875, 'bytes': 3449, 'bytes_per_token': 3.9417, 'bits_per_token': 4.8804, 'ppl_token': 29.4535, 'bpb': 1.2381, 'bpb_calame': 0.8144, 'bpb_calame_ci95': [0.8087708210941426, 0.8200392662909984], 'bpb_calame_nseg': 2075, 'calame_acc': 0.5557, 'calame_se': 0.0109, 'calame_ci95': [0.5349397590361445, 0.5768674698795181], 'calame_n': 2075}

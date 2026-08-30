@@ -1,0 +1,62 @@
+name: Monthly URL Checker
+
+on:
+  schedule:
+    # Run on the 1st of every month at 08:00 UTC
+    - cron: '0 8 1 * *'
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:          # ← ADICIONADO (bloco inteiro)
+  contents: read
+  issues: write
+
+jobs:
+  check-urls:
+    name: Verify corpus URLs
+    runs-on: ubuntu-latest
+    env:                                        # ← ADICIONADO (bloco inteiro)
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'               # ← ALTERADO (era 3.11)
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run URL checker
+        id: url_check
+        run: |
+          python scripts/check-urls.py reports/ || echo "BROKEN_FOUND=true" >> $GITHUB_OUTPUT
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: url-check-report-${{ github.run_id }}
+          path: check-urls-report.json
+          retention-days: 90
+
+      - name: Open issue if broken URLs found
+        if: steps.url_check.outputs.BROKEN_FOUND == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Automated] Broken URLs detected — ${date}`,
+              body: `## 🔴 Monthly URL Check Found Broken Links\n\n` +
+                    `The automated URL checker found one or more broken links in the ` +
+                    `\`reports/\` directory.\n\n` +
+                    `**Action required:** Check the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) ` +
+                    `for the full report, identify the correct URLs, and submit a PR.\n\n` +
+                    `See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions on fixing broken URLs.\n\n` +
+                    `cc: @brunolsm @fporto`,
+              labels: ['broken-url', 'automated'],
+            });

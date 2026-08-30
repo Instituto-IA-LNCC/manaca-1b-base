@@ -1,0 +1,26 @@
+# syntax=docker/dockerfile:1
+# =============================================================================
+# Manacá — Imagem GPU ENXUTA: lm-evaluation-harness (ARC-PT/HellaSwag-PT/LAMBADA-PT)
+# =============================================================================
+# So o necessario para rodar `lm_eval --model hf` (transformers), SEM vLLM.
+# Build (onde o DNS do `docker build` funciona):
+#   docker build -f docker/Dockerfile.lmeval -t manaca-lmeval:latest .
+# NO NETUNO o `docker build` quebra no DNS (nao aceita --sysctl p/ IPv6). Use:
+#   ./scripts/eval/build_lmeval_image.sh   (instala lm-eval na manaca-train e commita)
+ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:24.12-py3
+FROM ${BASE_IMAGE}
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    HF_HOME=/hf
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements/lmeval.txt /tmp/requirements/lmeval.txt
+RUN python -m pip install -r /tmp/requirements/lmeval.txt
+
+WORKDIR /workspace
+CMD ["lm_eval", "--help"]

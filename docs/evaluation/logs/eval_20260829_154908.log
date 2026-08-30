@@ -1,0 +1,14 @@
+[eval] device=cuda  modelo=TucanoBR/Tucano-1b1
+[eval] tokenizador=HF(32000)  janela=2048 stride=1024 lowercase=True
+[eval] CALAME: baixando calamept_all.jsonl do HF (sem pip)...
+[eval] CALAME-PT: 2075 exemplos
+[eval] ---- modelagem de linguagem ----
+[eval]   BPB (bits/byte)   : 0.7277   (menor e melhor)
+[eval]   perplexidade/token: 12.865
+[eval]   bits/token        : 3.6853
+[eval]   bytes/token       : 5.0646   (681 tokens, 3449 bytes)
+/usr/local/lib/python3.12/dist-packages/transformers/generation/configuration_utils.py:590: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.1` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+[eval] ---- CALAME-PT ----
+[eval]   acuracia ultima palavra: 1204/2075 = 58.02%
+[eval] RESUMO: {'model': 'TucanoBR/Tucano-1b1', 'tokenizer': 'HF(32000)', 'tokens': 681, 'bytes': 3449, 'bytes_per_token': 5.0646, 'bits_per_token': 3.6853, 'ppl_token': 12.8645, 'bpb': 0.7277, 'calame_acc': 0.5802, 'calame_n': 2075}

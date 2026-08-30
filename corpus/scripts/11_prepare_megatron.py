@@ -1,0 +1,283 @@
+#!/usr/bin/env python3
+"""
+Manacá-1B — Fase 2b · Preparação dos dados para o Megatron (.bin/.idx)
+======================================================================
+A "cola" entre o tokenizador (Fase 2a) e o pré-treino (Fase 2b): converte o
+corpus Parquet (raw/{gigaverbo,wikipedia_ptbr,ulysses}) para o formato indexado
+mmap do Megatron-LM (.bin/.idx), usando o tokenizador SentencePiece treinado.
+
+Duas etapas (padrão do Megatron / LLM-jp):
+  1) Parquet -> JSONL: uma linha {"text": "..."} por documento (via pyarrow).
+     Documentos maiores que --max-doc-chars são TRUNCADOS (outliers gigantes —
+     ex.: códigos legais inteiros do Ulysses — estouram o pipe do multiprocessing
+     do preprocess_data.py, causando BrokenPipeError e saída corrompida).
+  2) JSONL -> .bin/.idx: /opt/Megatron-LM/tools/preprocess_data.py com
+     --tokenizer-type SentencePieceTokenizer --tokenizer-model <.model>
+     --append-eod (marca fim de documento, essencial p/ pré-treino GPT).
+
+Ao final, VERIFICA a saída (o .idx é escrito na finalização, ponto frágil):
+carrega o dataset indexado e confere nº de documentos e de tokens. Só declara
+sucesso — e só remove o JSONL, se --delete-jsonl — quando a verificação passa.
+
+RODA NA IMAGEM 'train' (tem Megatron-LM + sentencepiece + pyarrow):
+    make build-train           # se ainda não construiu a imagem de treino
+    make tokenizer             # se ainda não treinou o tokenizador (Fase 2a)
+    make preprocess-megatron
+    # equivalente: docker compose run --rm train \
+    #     python corpus/scripts/11_prepare_megatron.py
+
+Saída (default — casa EXATAMENTE com o DATA_PATH do run_pretrain.sh):
+    $WORK_DIR/megatron-data/manaca_text_text_document.bin
+    $WORK_DIR/megatron-data/manaca_text_text_document.idx
+    (o sufixo "_text_document" é gerado pelo Megatron a partir de --json-keys text)
+
+Depois disto, o pré-treino roda direto:
+    make pretrain
+
+Autor: Bruno Leonardo Santos Menezes <brunolsm@lncc.br>
+Versão: 0.2.0 — Julho 2026
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+try:
+    import pyarrow.parquet as pq
+except ImportError:
+    print("[ERRO] pyarrow ausente — rode dentro da imagem 'train' "
+          "(docker compose run --rm train python corpus/scripts/11_prepare_megatron.py).")
+    sys.exit(1)
+
+WORK_DIR   = Path(os.environ.get("WORK_DIR", Path.home() / "manaca-corpus"))
+RAW_DIR    = WORK_DIR / "raw"
+OUT_DIR    = WORK_DIR / "megatron-data"
+TOK_MODEL  = WORK_DIR / "tokenizer" / "manaca-tokenizer.model"
+MEGATRON   = Path(os.environ.get("MEGATRON_PATH", "/opt/Megatron-LM"))
+
+# Fontes do corpus do Manacá-1B (subpastas em raw/). Ordem = ordem de escrita.
+SOURCES = ["gigaverbo", "wikipedia_ptbr", "ulysses"]
+
+# Prefixo de saída. O Megatron acrescenta "_<json-key>_document"; com a chave
+# "text" o resultado é "manaca_text_text_document", igual ao DATA_PATH do treino.
+OUT_PREFIX_NAME = "manaca_text"
+JSON_KEY = "text"
+
+# Limite de caracteres por documento na etapa 1. Documentos maiores são
+# truncados: evita que um único doc gigante (ex.: uma lei inteira) gere um
+# array enorme que estoura o pipe do multiprocessing do preprocess_data.py.
+# 1.000.000 chars ≈ 250 mil tokens ≈ 61 sequências de 4096 — folga de sobra.
+DEFAULT_MAX_DOC_CHARS = 1_000_000
+
+
+def log(msg: str) -> None:
+    print(f"{time.strftime('%H:%M:%S')} | {msg}", flush=True)
+
+
+def export_jsonl(sources: list[str], jsonl_path: Path, max_doc_chars: int) -> int:
+    """Etapa 1: Parquet -> JSONL (uma linha {"text": ...} por documento)."""
+    available = [s for s in sources if (RAW_DIR / s).exists()]
+    missing = [s for s in sources if not (RAW_DIR / s).exists()]
+    if missing:
+        log(f"[aviso] fontes ausentes em {RAW_DIR}: {missing}")
+    if not available:
+        log(f"[ERRO] nenhuma fonte encontrada em {RAW_DIR}. Esperado: {sources}")
+        raise SystemExit(1)
+
+    jsonl_path.parent.mkdir(parents=True, exist_ok=True)
+    total_docs = 0
+    total_bytes = 0
+    truncated = 0
+    t0 = time.time()
+
+    log(f"[1/2] Exportando JSONL -> {jsonl_path}  (max_doc_chars={max_doc_chars:,})")
+    with open(jsonl_path, "w", encoding="utf-8") as out:
+        for src in available:
+            src_dir = RAW_DIR / src
+            shards = sorted(src_dir.glob("*.parquet"))
+            log(f"  fonte '{src}': {len(shards)} shards")
+            src_docs = 0
+            for shard in shards:
+                try:
+                    pf = pq.ParquetFile(shard)
+                except Exception as e:
+                    log(f"    [aviso] ignorando {shard.name}: {e}")
+                    continue
+                for batch in pf.iter_batches(batch_size=1000, columns=[JSON_KEY]):
+                    for value in batch.column(JSON_KEY):
+                        text = value.as_py()
+                        if not text or not isinstance(text, str):
+                            continue
+                        # Trunca outliers gigantes (proteção contra BrokenPipe).
+                        if len(text) > max_doc_chars:
+                            text = text[:max_doc_chars]
+                            truncated += 1
+                        # Uma linha JSON por documento. NÃO normalizamos o texto:
+                        # o pré-treino preserva a estrutura original (parágrafos etc.).
+                        line = json.dumps({JSON_KEY: text}, ensure_ascii=False)
+                        out.write(line)
+                        out.write("\n")
+                        src_docs += 1
+                        total_bytes += len(line) + 1
+            total_docs += src_docs
+            log(f"    '{src}': {src_docs:,} docs | acumulado {total_docs:,} docs "
+                f"| {total_bytes/1e9:.1f} GB")
+
+    dt = time.time() - t0
+    log(f"[1/2] OK: {total_docs:,} documentos ({truncated:,} truncados por tamanho), "
+        f"{total_bytes/1e9:.1f} GB em {dt/60:.1f} min")
+    return total_docs
+
+
+def run_preprocess(jsonl_path: Path, out_prefix: Path, tok_model: Path,
+                   workers: int, extra_args: list[str]) -> None:
+    """Etapa 2: JSONL -> .bin/.idx via tools/preprocess_data.py do Megatron."""
+    script = MEGATRON / "tools" / "preprocess_data.py"
+    if not script.exists():
+        log(f"[ERRO] não encontrei {script}. Rode na imagem 'train' "
+            f"(MEGATRON_PATH={MEGATRON}).")
+        raise SystemExit(1)
+    if not tok_model.exists():
+        log(f"[ERRO] tokenizador não encontrado: {tok_model}. Rode antes: make tokenizer")
+        raise SystemExit(1)
+
+    out_prefix.parent.mkdir(parents=True, exist_ok=True)
+    cmd = [
+        sys.executable, str(script),
+        "--input", str(jsonl_path),
+        "--output-prefix", str(out_prefix),
+        "--tokenizer-type", "SentencePieceTokenizer",
+        "--tokenizer-model", str(tok_model),
+        "--json-keys", JSON_KEY,
+        "--append-eod",
+        "--workers", str(workers),
+        *extra_args,
+    ]
+    log(f"[2/2] Tokenizando p/ Megatron (.bin/.idx), workers={workers}")
+    log("      " + " ".join(cmd))
+    subprocess.run(cmd, check=True)
+
+
+def verify_output(out_prefix: Path) -> tuple[int, int]:
+    """
+    Confere a saída do preprocess. O .idx é gravado só na finalização — se um
+    worker morreu no fim (BrokenPipe), ele pode faltar mesmo com exit 0. Aqui
+    exigimos .bin + .idx e carregamos o dataset para contar docs e tokens.
+    Lança RuntimeError se algo estiver faltando/inconsistente.
+    """
+    bin_p = out_prefix.parent / f"{OUT_PREFIX_NAME}_{JSON_KEY}_document.bin"
+    idx_p = out_prefix.parent / f"{OUT_PREFIX_NAME}_{JSON_KEY}_document.idx"
+    if not bin_p.exists() or not idx_p.exists():
+        raise RuntimeError(
+            f".bin ou .idx ausente (bin={bin_p.exists()}, idx={idx_p.exists()}). "
+            "A finalização do preprocess falhou (provável BrokenPipe de worker)."
+        )
+    import numpy as np
+    from megatron.core.datasets.indexed_dataset import IndexedDataset
+    ds = IndexedDataset(str(out_prefix.parent / f"{OUT_PREFIX_NAME}_{JSON_KEY}_document"))
+    docs = len(ds.document_indices) - 1
+    toks = int(np.sum(ds.sequence_lengths))
+    if docs <= 0 or toks <= 0:
+        raise RuntimeError(f"dataset vazio (docs={docs}, tokens={toks}).")
+    return docs, toks
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(
+        description="Prepara o corpus Parquet -> Megatron .bin/.idx (Fase 2b).",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    ap.add_argument("--sources", nargs="*", default=SOURCES,
+                    help=f"Fontes (subpastas de raw/). Default: {SOURCES}")
+    ap.add_argument("--tokenizer-model", type=Path, default=TOK_MODEL,
+                    help="Caminho do .model do SentencePiece. Default: <WORK_DIR>/tokenizer/manaca-tokenizer.model")
+    ap.add_argument("--out-dir", type=Path, default=OUT_DIR,
+                    help="Diretório de saída. Default: <WORK_DIR>/megatron-data")
+    ap.add_argument("--jsonl", type=Path, default=None,
+                    help="Caminho do JSONL intermediário. Default: <out-dir>/manaca_corpus.jsonl")
+    ap.add_argument("--workers", type=int, default=min(os.cpu_count() or 8, 32),
+                    help="Processos de tokenização. Default: min(nº de CPUs, 32). "
+                         "Baixe (ex.: 16) se houver BrokenPipe/estouro de memória.")
+    ap.add_argument("--max-doc-chars", type=int, default=DEFAULT_MAX_DOC_CHARS,
+                    help=f"Trunca documentos acima deste tamanho. Default: {DEFAULT_MAX_DOC_CHARS:,}.")
+    ap.add_argument("--skip-export", action="store_true",
+                    help="Pula a etapa 1 (reaproveita um JSONL já existente).")
+    ap.add_argument("--delete-jsonl", action="store_true",
+                    help="Remove o JSONL intermediário após verificar a saída "
+                         "(default: MANTÉM, para retomar sem reexportar se algo falhar).")
+    ap.add_argument("--force", action="store_true",
+                    help="Sobrescreve .bin/.idx existentes.")
+    ap.add_argument("--preprocess-arg", action="append", default=[],
+                    help="Argumento extra p/ o preprocess_data.py (repetível). Ex.: --preprocess-arg=--partitions=2")
+    args = ap.parse_args()
+
+    out_dir = args.out_dir
+    jsonl_path = args.jsonl or (out_dir / "manaca_corpus.jsonl")
+    out_prefix = out_dir / OUT_PREFIX_NAME
+    bin_path = out_dir / f"{OUT_PREFIX_NAME}_{JSON_KEY}_document.bin"
+    idx_path = out_dir / f"{OUT_PREFIX_NAME}_{JSON_KEY}_document.idx"
+
+    log("=" * 64)
+    log("Manacá-1B — Preparação dos dados para o Megatron (Fase 2b)")
+    log(f"  Corpus:     {RAW_DIR}  (fontes: {args.sources})")
+    log(f"  Tokenizer:  {args.tokenizer_model}")
+    log(f"  Saída:      {bin_path}")
+    log("=" * 64)
+
+    if bin_path.exists() and idx_path.exists() and not args.force:
+        log(f"[ok] .bin/.idx já existem em {out_dir} — nada a fazer (use --force para refazer).")
+        log(f"     DATA_PATH p/ o run_pretrain.sh: {out_prefix}_{JSON_KEY}_document")
+        return 0
+
+    # Remove um .bin órfão de execução anterior corrompida (sem .idx),
+    # para não confundir a contagem de espaço nem o builder.
+    if bin_path.exists() and not idx_path.exists():
+        log(f"[limpeza] removendo .bin órfão de execução anterior ({bin_path.stat().st_size/1e9:.1f} GB)")
+        bin_path.unlink()
+
+    if not args.skip_export:
+        export_jsonl(args.sources, jsonl_path, args.max_doc_chars)
+    else:
+        if not jsonl_path.exists():
+            log(f"[ERRO] --skip-export mas o JSONL não existe: {jsonl_path}")
+            return 1
+        log(f"[1/2] Pulando export — reaproveitando {jsonl_path}")
+
+    run_preprocess(jsonl_path, out_prefix, args.tokenizer_model,
+                   args.workers, args.preprocess_arg)
+
+    # Verificação obrigatória: exige .bin + .idx e carrega o dataset.
+    try:
+        docs, toks = verify_output(out_prefix)
+    except Exception as e:
+        log(f"[ERRO] verificação da saída falhou: {e}")
+        log("       O JSONL foi MANTIDO. Tente de novo com menos workers, ex.:")
+        log("         make preprocess-megatron ARGS=\"--skip-export --workers 16\"")
+        return 1
+    log(f"[verificação] OK: {docs:,} documentos | {toks:,} tokens (~{toks/1e9:.2f}B)")
+
+    if args.delete_jsonl:
+        try:
+            size_gb = jsonl_path.stat().st_size / 1e9
+            jsonl_path.unlink()
+            log(f"[limpeza] JSONL intermediário removido ({size_gb:.1f} GB liberados).")
+        except OSError as e:
+            log(f"[aviso] não removi o JSONL: {e}")
+    else:
+        log(f"[info] JSONL mantido em {jsonl_path} (use --delete-jsonl p/ remover).")
+
+    log("=" * 64)
+    log("CONCLUÍDO. Para treinar:")
+    log(f"  DATA_PATH={out_prefix}_{JSON_KEY}_document  (já é o default do run_pretrain.sh)")
+    log("  make pretrain")
+    log("=" * 64)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
