@@ -49,8 +49,20 @@ echo "[hf] tokenizador | tokenizer: ${TOKENIZER_DIR:-[usando o do MODEL_DIR | us
 echo "[hf] staging : $STAGE_DIR"
 
 # ── Pré-condições | Preconditions ────────────────────────────────────────────
-command -v huggingface-cli >/dev/null 2>&1 || {
-  echo "ERRO | ERROR: huggingface-cli não encontrado. Rode | run: pip install -U 'huggingface_hub[cli]'"; exit 1; }
+# Detecta a CLI do Hugging Face | Detect the Hugging Face CLI.
+# No huggingface_hub >= 1.0 a CLI é 'hf'; 'huggingface-cli' é legada e pode estar
+# quebrada por uma instalação antiga em /usr/local/bin.
+# In huggingface_hub >= 1.0 the CLI is 'hf'; 'huggingface-cli' is legacy and may be
+# broken by an old install under /usr/local/bin.
+HF_CLI="$(command -v hf || command -v huggingface-cli || true)"
+[ -n "$HF_CLI" ] || {
+  echo "ERRO | ERROR: CLI do Hugging Face não encontrada no PATH | Hugging Face CLI not on PATH."
+  echo "  A CLI nova (hf) costuma ficar em ~/.local/bin | The new CLI (hf) is usually in ~/.local/bin. Faça | do:"
+  echo "    pip install -U huggingface_hub"
+  echo "    export PATH=\"\$HOME/.local/bin:\$PATH\"; hash -r"
+  echo "    hf auth login"
+  exit 1; }
+echo "[hf] cli     : $HF_CLI"
 [ -f "$MODEL_DIR/config.json" ] || { echo "ERRO | ERROR: $MODEL_DIR/config.json ausente | missing"; exit 1; }
 ls "$MODEL_DIR"/*.safetensors >/dev/null 2>&1 || {
   echo "ERRO | ERROR: nenhum .safetensors em | no .safetensors in $MODEL_DIR"; exit 1; }
@@ -88,9 +100,10 @@ echo
 echo "[hf] conteúdo a publicar | contents to publish:"
 ls -lh "$STAGE_DIR"
 
-# ── Cria o repo (idempotente) e faz o upload | Create the repo (idempotent) and upload ──
-huggingface-cli repo create "$HF_REPO" --repo-type model -y 2>/dev/null || true
-huggingface-cli upload "$HF_REPO" "$STAGE_DIR" . --repo-type model \
+# ── Upload (cria o repo se não existir) | Upload (creates the repo if missing) ──
+# 'hf upload' cria o repositório automaticamente se ele ainda não existir.
+# 'hf upload' auto-creates the repository if it does not exist yet.
+"$HF_CLI" upload "$HF_REPO" "$STAGE_DIR" . --repo-type model \
   --commit-message "Manacá-1B base: weights, fixed tokenizer, and model card"
 
 echo
