@@ -34,6 +34,7 @@ com testes pareados de significância.
 Científica (Brasil) × National Institute of Informatics (Japão).
 
 🤗 **Modelo no Hugging Face:** [`menezesbruno/manaca-1b-base`](https://huggingface.co/menezesbruno/manaca-1b-base)
+<br>📄 **Artigo (preprint):** [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf) 
 
 ### Resultados
 
