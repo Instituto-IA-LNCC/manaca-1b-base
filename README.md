@@ -169,7 +169,7 @@ significa "verdadeiro centro", uma ponte cultural Brasil-Japão. Fundamentação
 
 | Documento | Link |
 |-----------|------|
-| ★ Preprint (arXiv, LaTeX) | [paper/manaca1b.tex](paper/manaca1b.tex) |
+| ★ Preprint (arXiv, PDF) | [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf) |
 | Guia de configuração Docker | [setup-guide-docker-pt.md](docs/environment/setup-guide-docker-pt.md) |
 | Relatório de avaliação (10 modelos, testes pareados) | [manaca-1b-base-eval-pt.md](docs/evaluation/manaca-1b-base-eval-pt.md) |
 | Manual técnico do corpus | [corpus/README.md](corpus/README.md) |
@@ -221,6 +221,7 @@ paired significance tests.
 Computing (Brazil) × National Institute of Informatics (Japan).
 
 🤗 **Model on Hugging Face:** [`menezesbruno/manaca-1b-base`](https://huggingface.co/menezesbruno/manaca-1b-base)
+<br>📄 **Paper (preprint):** [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf)
 
 ### Results
 
@@ -348,7 +349,7 @@ metaphor for the maturation stages of a language model. In Japanese, **マナカ
 
 | Document | Link |
 |----------|------|
-| ★ Preprint (arXiv, LaTeX) | [paper/manaca1b.tex](paper/manaca1b.tex) |
+| ★ Preprint (arXiv, PDF) | [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf) |
 | Docker setup guide | [setup-guide-docker-pt.md](docs/environment/setup-guide-docker-pt.md) |
 | Evaluation report (10 models, paired tests) | [manaca-1b-base-eval-pt.md](docs/evaluation/manaca-1b-base-eval-pt.md) |
 | Corpus technical manual | [corpus/README.md](corpus/README.md) |
