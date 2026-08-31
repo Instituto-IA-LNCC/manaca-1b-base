@@ -78,7 +78,7 @@ modelo base nessa escala.
 | Passos / batch global / tokens | 20.000 / 512 / ~41,9B (~24 tok/param) |
 | Referência de arquitetura | LLM-jp-3.1-1.8B |
 
-Detalhes de arquitetura e otimização: [`paper/manaca1b.tex`](paper/manaca1b.tex) e
+Detalhes de arquitetura e otimização: [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf) e
 [`models/README.md`](models/README.md). A conversão Megatron para HuggingFace, que
 preserva os biases e desempacota QKV/GQA e o SwiGLU, está em
 [`scripts/ckpt_converter/`](scripts/ckpt_converter/).
@@ -245,7 +245,7 @@ paired margins; only Sabiá-7B, four times larger, scores higher). It **ties** t
 1-to-2B Portuguese models on CALAME-PT and clearly **beats** same-size peers from other
 varieties and languages; on multiple-choice reasoning (ARC-Challenge-PT) it sits near
 chance, as does every base model at this scale. The full table, the paired McNemar
-tests, and the harness validation are in the [preprint](paper/manaca1b.tex) and in
+tests, and the harness validation are in the [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf) and in
 [`docs/evaluation/`](docs/evaluation/).
 
 ### The model
