@@ -1,7 +1,7 @@
 # Manacá-1B — LLM aberto e reprodutível para o Português do Brasil<br>An Open, Reproducible Brazilian-Portuguese Language Model
 
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
-[![Model: Manacá-1B](https://img.shields.io/badge/Model-Manac%C3%A1--1B-purple.svg)]()
+[![Model on Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Model-menezesbruno%2Fmanaca--1b--base-yellow.svg)](https://huggingface.co/menezesbruno/manaca-1b-base)
 [![Environment: Docker](https://img.shields.io/badge/Environment-Docker%20(reproducible)-2496ED.svg)](docs/environment/setup-guide-docker-pt.md)
 [![Language: PT-BR](https://img.shields.io/badge/Language-PT--BR-009c3b.svg)]()
 [![Institution: LNCC](https://img.shields.io/badge/Institution-LNCC-002776.svg)](https://www.lncc.br)
@@ -32,6 +32,8 @@ com testes pareados de significância.
 
 **Cooperação científica LNCC × NII/LLM-jp** — Laboratório Nacional de Computação
 Científica (Brasil) × National Institute of Informatics (Japão).
+
+🤗 **Modelo no Hugging Face:** [`menezesbruno/manaca-1b-base`](https://huggingface.co/menezesbruno/manaca-1b-base)
 
 ### Resultados
 
@@ -216,6 +218,8 @@ paired significance tests.
 
 **Scientific cooperation LNCC × NII/LLM-jp** — National Laboratory for Scientific
 Computing (Brazil) × National Institute of Informatics (Japan).
+
+🤗 **Model on Hugging Face:** [`menezesbruno/manaca-1b-base`](https://huggingface.co/menezesbruno/manaca-1b-base)
 
 ### Results
 

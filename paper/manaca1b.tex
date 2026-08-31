@@ -68,8 +68,8 @@ byte-fallback and depressing scores in a way that is invisible in aggregate
 metrics. The uncorrected tokenizer lowered LAMBADA-PT accuracy from 45.3 to 25.0;
 we quantify the effect and provide a one-line fix that reproduces the training
 tokenizer exactly. Code, raw training and evaluation logs, per-example prediction
-vectors, and the corrected tokenizer are released so that every number in this
-paper can be recomputed.
+vectors, the model weights, and the corrected tokenizer are released so that every
+number in this paper can be recomputed.
 \end{abstract}
 
 \section{Introduction}
@@ -619,7 +619,10 @@ paired tests, the scripts that produce the tables and Figure~\ref{fig:panel}, an
 corrected tokenizer described in Section~\ref{sec:tok}. The evaluation harness version
 is pinned, the benchmark datasets are named by their public identifiers, and the
 statistical tests are implemented as small, auditable scripts rather than computed by
-hand.
+hand. The code is released at
+\url{https://github.com/Instituto-IA-LNCC/manaca-1b-base}, and the model weights,
+together with the corrected tokenizer of Section~\ref{sec:tok}, are published under a
+CC BY 4.0 license at \url{https://huggingface.co/menezesbruno/manaca-1b-base}.
 
 \section{Conclusion}
 
