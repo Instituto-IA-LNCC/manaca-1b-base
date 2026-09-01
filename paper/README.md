@@ -2,7 +2,7 @@
 
 **[🇧🇷 Português](#português)** · **[🇬🇧 English](#english)**
 
-<br>📄 **Artigo (preprint):** [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf) 
+<br>📄 **Artigo (preprint):** [`paper/manaca_1b_base_arxiv.pdf`](https://arxiv.org/abs/2608.30114) 
 
 ## Português
 
@@ -66,7 +66,7 @@ Categoria sugerida: `cs.CL` (primária), `cs.LG` (secundária).
 
 ## English
 
-<br>📄 **Paper (preprint):** [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf) 
+<br>📄 **Paper (preprint):** [`paper/manaca_1b_base_arxiv.pdf`](https://arxiv.org/abs/2608.30114) 
 
 `manaca1b.tex` is the manuscript, written for submission to arXiv: a single
 self-contained `.tex` (bibliography embedded in `thebibliography`, only standard
