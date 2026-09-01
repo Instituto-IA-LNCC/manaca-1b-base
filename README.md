@@ -34,7 +34,7 @@ com testes pareados de significância.
 Científica (Brasil) × National Institute of Informatics (Japão).
 
 🤗 **Modelo no Hugging Face:** [`menezesbruno/manaca-1b-base`](https://huggingface.co/menezesbruno/manaca-1b-base)
-<br>📄 **Artigo (preprint):** [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf) 
+<br>📄 **Artigo (preprint):** [`paper/manaca_1b_base_arxiv.pdf`](https://arxiv.org/abs/2608.30114) 
 
 ### Resultados
 
@@ -78,7 +78,7 @@ modelo base nessa escala.
 | Passos / batch global / tokens | 20.000 / 512 / ~41,9B (~24 tok/param) |
 | Referência de arquitetura | LLM-jp-3.1-1.8B |
 
-Detalhes de arquitetura e otimização: [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf) e
+Detalhes de arquitetura e otimização: [`paper/manaca_1b_base_arxiv.pdf`](https://arxiv.org/abs/2608.30114) e
 [`models/README.md`](models/README.md). A conversão Megatron para HuggingFace, que
 preserva os biases e desempacota QKV/GQA e o SwiGLU, está em
 [`scripts/ckpt_converter/`](scripts/ckpt_converter/).
@@ -169,7 +169,7 @@ significa "verdadeiro centro", uma ponte cultural Brasil-Japão. Fundamentação
 
 | Documento | Link |
 |-----------|------|
-| ★ Preprint (arXiv, PDF) | [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf) |
+| ★ Preprint (arXiv, PDF) | [`paper/manaca_1b_base_arxiv.pdf`](https://arxiv.org/abs/2608.30114) |
 | Guia de configuração Docker | [setup-guide-docker-pt.md](docs/environment/setup-guide-docker-pt.md) |
 | Relatório de avaliação (10 modelos, testes pareados) | [manaca-1b-base-eval-pt.md](docs/evaluation/manaca-1b-base-eval-pt.md) |
 | Manual técnico do corpus | [corpus/README.md](corpus/README.md) |
@@ -221,7 +221,7 @@ paired significance tests.
 Computing (Brazil) × National Institute of Informatics (Japan).
 
 🤗 **Model on Hugging Face:** [`menezesbruno/manaca-1b-base`](https://huggingface.co/menezesbruno/manaca-1b-base)
-<br>📄 **Paper (preprint):** [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf)
+<br>📄 **Paper (preprint):** [`paper/manaca_1b_base_arxiv.pdf`](https://arxiv.org/abs/2608.30114)
 
 ### Results
 
@@ -245,7 +245,7 @@ paired margins; only Sabiá-7B, four times larger, scores higher). It **ties** t
 1-to-2B Portuguese models on CALAME-PT and clearly **beats** same-size peers from other
 varieties and languages; on multiple-choice reasoning (ARC-Challenge-PT) it sits near
 chance, as does every base model at this scale. The full table, the paired McNemar
-tests, and the harness validation are in the [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf) and in
+tests, and the harness validation are in the [`paper/manaca_1b_base_arxiv.pdf`](https://arxiv.org/abs/2608.30114) and in
 [`docs/evaluation/`](docs/evaluation/).
 
 ### The model
@@ -262,7 +262,7 @@ tests, and the harness validation are in the [`paper/manaca_1b_base_arxiv.pdf`](
 | Steps / global batch / tokens | 20,000 / 512 / ~41.9B (~24 tok/param) |
 | Architecture reference | LLM-jp-3.1-1.8B |
 
-Architecture and optimization details are in [`paper/manaca1b.tex`](paper/manaca1b.tex)
+Architecture and optimization details are in [`paper`](https://arxiv.org/abs/2608.30114)
 and [`models/README.md`](models/README.md). The Megatron to HuggingFace conversion,
 which preserves the biases and unpacks QKV/GQA and the SwiGLU, is in
 [`scripts/ckpt_converter/`](scripts/ckpt_converter/).
@@ -349,7 +349,7 @@ metaphor for the maturation stages of a language model. In Japanese, **マナカ
 
 | Document | Link |
 |----------|------|
-| ★ Preprint (arXiv, PDF) | [`paper/manaca_1b_base_arxiv.pdf`](https://github.com/Instituto-IA-LNCC/manaca-1b-base/blob/main/paper/manaca_1b_base_arxiv.pdf) |
+| ★ Preprint (arXiv, PDF) | [`paper/manaca_1b_base_arxiv.pdf`](https://arxiv.org/abs/2608.30114) |
 | Docker setup guide | [setup-guide-docker-pt.md](docs/environment/setup-guide-docker-pt.md) |
 | Evaluation report (10 models, paired tests) | [manaca-1b-base-eval-pt.md](docs/evaluation/manaca-1b-base-eval-pt.md) |
 | Corpus technical manual | [corpus/README.md](corpus/README.md) |
