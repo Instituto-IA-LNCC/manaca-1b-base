@@ -56,7 +56,7 @@
 ```
 [Author(s)] ([Year]). [Title]. LLM-BR Technical Report. 
 LNCC × NII/LLM-jp Project. 
-GitHub: https://github.com/Instituto-IA-LNCC/manaca
+GitHub: https://github.com/Instituto-IA-LNCC/manaca-1b-base
 ```
 
 ---
