@@ -86,6 +86,18 @@ Para a tabela completa de 100 linhas com todos os códigos de status, veja o rel
 
 ---
 
+### Correções Pós-Auditoria
+
+Links quebrados apontados pela verificação automática mensal depois da auditoria de março de 2026.
+
+| Data | Original | Correto | Motivo |
+|------|----------|---------|--------|
+| 2026-09 | `github.com/Instituto-IA-LNCC/manaca` | `github.com/Instituto-IA-LNCC/manaca-1b-base` | Repositório renomeado — HTTP 404 |
+| 2026-09 | `www.nilc.icmc.usp.br/` | `sites.google.com/view/nilc-usp/` | Servidor legado fora do ar; portal do NILC migrado para o Google Sites |
+| 2026-09 | `openalex.org/` | sem alteração | Falso positivo: HTTP 403 por proteção anti-bot. Domínio adicionado a `SKIP_PATTERNS` em `check-urls.py` |
+
+---
+
 ### Verificação Automatizada
 
 Um script Python para verificação periódica das URLs está disponível em [`scripts/check-urls.py`](../../scripts/check-urls.py).
@@ -183,6 +195,18 @@ Brazilian university servers migrated paths, subdomains, or dropped legacy IPs.
 ### Full Audit Table
 
 For the complete 100-row audit table with all status codes, see the full report in `assets/relatorio_corpora_ptbr_lncc_nii.docx` (Appendix A).
+
+---
+
+### Post-Audit Corrections
+
+Broken links reported by the monthly automated check after the March 2026 audit.
+
+| Date | Original | Correct | Reason |
+|------|----------|---------|--------|
+| 2026-09 | `github.com/Instituto-IA-LNCC/manaca` | `github.com/Instituto-IA-LNCC/manaca-1b-base` | Repository renamed — HTTP 404 |
+| 2026-09 | `www.nilc.icmc.usp.br/` | `sites.google.com/view/nilc-usp/` | Legacy server unreachable; NILC portal moved to Google Sites |
+| 2026-09 | `openalex.org/` | unchanged | False positive: HTTP 403 from bot protection. Domain added to `SKIP_PATTERNS` in `check-urls.py` |
 
 ---
 
