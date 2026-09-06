@@ -153,7 +153,7 @@ Este relatório é um produto da **Ação 6 do Plano de 90 Dias** (Fase 0 — Pr
 | Portal | URL | Tipo |
 |--------|-----|------|
 | Linguateca / AC-DC | [linguateca.pt](https://www.linguateca.pt/) | Portal ⚠ SSL |
-| NILC (USP/ICMC) | [nilc.icmc.usp.br](http://www.nilc.icmc.usp.br/) | Portal |
+| NILC (USP/ICMC) | [sites.google.com/view/nilc-usp](https://sites.google.com/view/nilc-usp/) | Portal |
 | Hugging Face Hub (nilc-nlp) | [huggingface.co/nilc-nlp](https://huggingface.co/nilc-nlp) | Hub |
 | OPUS | [opus.nlpl.eu](https://opus.nlpl.eu/) | Hub paralelo |
 | awesome-portuguese-nlp | [github.com/ajdavidl/Portuguese-NLP](https://github.com/ajdavidl/Portuguese-NLP) | Lista curada |

@@ -73,6 +73,7 @@ SKIP_PATTERNS = [
     "kaggle.com",
     "linguateca.pt",   # SSL issues
     "sketchengine.eu", # paywall
+    "openalex.org",    # Cloudflare bot protection (HTTP 403 for automated clients)
 ]
 
 STATUS_EMOJI = {
