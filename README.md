@@ -220,7 +220,7 @@ paired significance tests.
 **Scientific cooperation LNCC × NII/LLM-jp** — National Laboratory for Scientific
 Computing (Brazil) × National Institute of Informatics (Japan).
 
-🤗 **Model on Hugging Face:** [`menezesbruno/manaca-1b-base`](https://huggingface.co/menezesbruno/manaca-1b-base)
+🤗 **Model on Hugging Face:** [`AIInstituteLNCC/manaca-1b-base`](https://huggingface.co/AIInstituteLNCC/manaca-1b-base)
 <br>📄 **Paper (preprint):** [`paper/manaca_1b_base_arxiv.pdf`](https://arxiv.org/abs/2608.30114)
 
 ### Results
